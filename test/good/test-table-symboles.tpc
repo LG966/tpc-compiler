@@ -1,0 +1,25 @@
+/* test-table-symboles.tpc */
+
+/* Test file for simplified translator of a declaration of variables in C */
+    int r1,b,s,c,r2 ;
+	char letter, digit, punct;
+
+struct elephant{
+    int nbPattes;
+    char sexe;
+};
+
+
+int test (int param1, char param2, char param3){
+    int a, b, c, d;
+    char m, d, m, a;
+}
+
+
+int main(void)  {
+   r1=12;
+   r2=24;
+   b=r1+r2;
+   punct='.';
+   return b;
+}
