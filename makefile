@@ -15,6 +15,11 @@ vpath %.y $(SRCPATH)
 vpath %.lex $(SRCPATH)
 vpath %.o $(BINPATH)  
 
+all: addFolders $(EXEC) 
+
+addFolders:
+	mkdir -p $(EXECPATH) $(BINPATH)
+
 $(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o
 	$(CC) -o $(EXECPATH)$@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
 
