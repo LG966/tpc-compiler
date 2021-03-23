@@ -25,7 +25,9 @@ static const char *StringFromKind[] = {
   "SuiteInstr",
   "Instr",
   "DeclChamps",
-  "DeclStruct"
+  "DeclStruct",
+  "UnaryOperator",
+  "Operator"
   /* and all other node labels */
   /* The list must coincide with the enum in abstract-tree.h */
   /* To avoid listing them twice, see https://stackoverflow.com/a/10966395 */
@@ -78,7 +80,7 @@ void printTree(Node *node) {
   for (int i = 1; i < depth; i++) { // 2502 = vertical line
     printf(rightmost[i] ? "    " : "\u2502   ");
   }
-  if (depth > 0) { // 2514 = up and right; 2500 = horiz; 251c = vertical and right 
+  if (depth > 0) { // 2514 = up and right; 2500 = horiz; 251c = vertical and right
     printf(rightmost[depth] ? "\u2514\u2500\u2500 " : "\u251c\u2500\u2500 ");
   }
   printf("%s", StringFromKind[node->kind]);
@@ -88,6 +90,7 @@ void printTree(Node *node) {
     case Identifier: printf(": %s", node->u.identifier); break;
     case StructType:
     case Type : printf(": %s", node->u.type); break;
+    case Operator : printf(": %s", node->u.identifier); break;
     default: break;
   }
   printf("\n");

@@ -17,23 +17,26 @@
 
 %union{
     struct Node * node;
+    int num;
+    char character;
     char string[64];
 }
 
-%token CHARACTER
-%token NUM
+%token <character> CHARACTER
+%token <num> NUM
 %token <string> IDENT
 %token <string> SIMPLETYPE
 %token ORDER EQ
-%token ADDSUB
-%token DIVSTAR
+%token <character> ADDSUB
+%token <character> DIVSTAR
 %token OR AND STRUCT IF WHILE RETURN VOID PRINT READC READE
 %precedence ')'
 %precedence ELSE
 
-%type <node> DeclVars Declarateurs Type TypesVars EnTeteFonct 
+%type <node> DeclVars Declarateurs Type TypesVars EnTeteFonct
 %type <node> DeclFoncts DeclFonct Parametres Corps ListTypVar Prog
-%type <node> DeclChamps //SuiteInstr Instr 
+%type <node> DeclChamps //SuiteInstr Instr
+//%type <node> F T E M TB FB Exp
 
 %%
 
@@ -59,8 +62,8 @@ TypesVars:
                                                             // Ajout d'un noeud "DeclStruct" pour différencier
                                                             // les déclarations de struct des déclarations
                                                             // de variable de type struct
-                                                            // Peut-être pas nécessaire 
-                                                            Node * declstruct = makeNode(DeclStruct); 
+                                                            // Peut-être pas nécessaire
+                                                            Node * declstruct = makeNode(DeclStruct);
                                                             addChild($$, declstruct);
                                                             addChild(declstruct, makeIdentifier($3));
                                                             addChild(declstruct, $5);
@@ -102,7 +105,7 @@ DeclChamps :
 DeclFoncts:
        DeclFoncts DeclFonct     {
                                     $$ = $1;
-                                    addChild($$, $2);                                    
+                                    addChild($$, $2);
                                 }
     |  DeclFonct                {
                                     $$ = makeNode(DeclFoncts);
@@ -153,7 +156,7 @@ ListTypVar:
 Corps: '{' DeclVars SuiteInstr '}'  {
                                         $$ = makeNode(Corps);
                                         addChild($$, $2);
-                                        //addChild($$, $3);    
+                                        //addChild($$, $3);
                                     }
     ;
 DeclVars:
@@ -189,36 +192,74 @@ Instr:
     |  IF '(' Exp ')' Instr
     |  IF '(' Exp ')' Instr ELSE Instr
     |  WHILE '(' Exp ')' Instr
-    |  Exp ';'
+    |  Exp ';'              {
+                                //$$ = $1;
+                            }
     |  RETURN Exp ';'
     |  RETURN ';'
     |  '{' SuiteInstr '}'
     |  ';'
     ;
 Exp :  Exp OR TB
-    |  TB
+    |  TB                    {
+                                //$$ = $1;
+                             }
     ;
 TB  :  TB AND FB
-    |  FB
+    |  FB                    {
+                                //$$ = $1;
+                             }
     ;
 FB  :  FB EQ M
-    |  M
+    |  M                     {
+                                  //$$ = $1;
+                             }
     ;
 M   :  M ORDER E
-    |  E
+    |  E                     {
+                                  //$$ = $1;
+                             }
     ;
-E   :  E ADDSUB T
-    |  T
+E   :  E ADDSUB T            {
+                                  //$$ = makeNode(Operator);
+                                  //$$->u.identifier[0] = $2;
+                                  //$$->u.identifier[1] = '\0';
+                                  //addChild($$, $1);
+                                  //addSibling($1, $3);
+                             }
+    |  T                     {
+                                  //$$ = $1;
+                             }
     ;
-T   :  T DIVSTAR F
-    |  F
+T   :  T DIVSTAR F           {
+                                  //$$ = makeNode(Operator);
+                                  //$$->u.identifier[0] = $2;
+                                  //$$->u.identifier[1] = '\0';
+                                  //addChild($$, $1);
+                                  //addSibling($1, $3);
+                             }
+    |  F                     {
+                                  //$$ = $1;
+                             }
     ;
-F   :  ADDSUB F
-    |  '!' F
-    |  '&' IDENT
-    |  '(' Exp ')'
-    |  NUM
-    |  CHARACTER
+F   :  ADDSUB F               {
+                                  //$$ = makeNode(UnaryOperator);
+                                  //$$->u.character = $1;
+                                  //addChild($$, $2);
+                              }
+    |  '!' F                  {}
+    |  '&' IDENT              {}
+    |  '(' Exp ')'            {
+                                  //$$ = $2;
+                              }
+    |  NUM                    {
+                                  //$$ = makeNode(IntLiteral);
+                                  //$$->u.integer = $1;
+                              }
+    |  CHARACTER              {
+                                  //$$ = makeNode(CharLiteral);
+                                  //$$->u.character = $1;
+                              }
     |  LValue
     |  IDENT '(' Arguments  ')'
     ;
@@ -247,17 +288,17 @@ int main(int argc, char** argv) {
 
 void yyerror(const char *s){
 	fprintf(stderr, "%s near line %d character %d\n", s, lineno,charno);
-    
+
 }
 
 Node * makeIdentifier(char * ident_name){
     Node * ident = makeNode(Identifier);
     strcpy(ident->u.identifier, ident_name);
     return ident;
-} 
+}
 
 Node * makeSimpleType(char * type_name){
-    Node * type = makeNode(Type); 
+    Node * type = makeNode(Type);
     strcpy(type->u.type, type_name);
     return type;
 }

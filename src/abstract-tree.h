@@ -4,7 +4,7 @@ typedef enum {
   Program = 0,
   VarDeclList = 1,
   Identifier = 2,
-  CharLiteral = 3, 
+  CharLiteral = 3,
   IntLiteral = 4,
   DeclVars = 5,
   Type = 6,
@@ -20,7 +20,9 @@ typedef enum {
   SuiteInstr,
   Instr,
   DeclChamps,
-  DeclStruct
+  DeclStruct,
+  UnaryOperator,
+  Operator
 
 
   /* and allother node labels */

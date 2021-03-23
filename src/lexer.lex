@@ -19,8 +19,8 @@
 "//"			{ charno += yyleng;BEGIN SHORT_COMMENT; }
 &&			{ charno += yyleng;return AND; }
 "||"			{ charno += yyleng;return OR; }
-"+"|-			{ charno += yyleng; return ADDSUB; }
-"*"|"/"|"%"			{ charno += yyleng;return DIVSTAR; }
+"+"|-			{ yylval.addsub=yytext[0]; charno += yyleng; return ADDSUB; }
+"*"|"/"|"%"			{ yylval.addsub=yytext[0]; charno += yyleng;return DIVSTAR; }
 "<"|"<="|">"|>=		{ charno += yyleng;return ORDER; }
 ==|!=			{ charno += yyleng;return EQ; }
 int			{ charno += yyleng; strcpy(yylval.string, yytext); return SIMPLETYPE;}
@@ -35,7 +35,7 @@ else			{ charno += yyleng;return ELSE; }
 while			{ charno += yyleng;return WHILE; }
 return			{ charno += yyleng;return RETURN; }
 [a-zA-Z_][a-zA-Z0-9_]*	{ charno += yyleng; strcpy(yylval.string, yytext); return IDENT; }
-[0-9]+			{ charno += yyleng; return NUM;}
+[0-9]+			{ charno += yyleng; sscanf(yytext, "%d", &(yylval.num)); return NUM;}
 '\\?.'			{ charno += yyleng; return CHARACTER; }
 .			{ charno += yyleng; return yytext[0];}
 <LONG_COMMENT>"*/"		{ BEGIN INITIAL; charno += yyleng; }
