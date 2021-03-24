@@ -19,8 +19,8 @@
 "//"			{ charno += yyleng;BEGIN SHORT_COMMENT; }
 &&			{ charno += yyleng;return AND; }
 "||"			{ charno += yyleng;return OR; }
-"+"|-			{ yylval.addsub=yytext[0]; charno += yyleng; return ADDSUB; }
-"*"|"/"|"%"			{ yylval.addsub=yytext[0]; charno += yyleng;return DIVSTAR; }
+"+"|-			{ yylval.character=yytext[0]; charno += yyleng; return ADDSUB; }
+"*"|"/"|"%"			{ yylval.character=yytext[0]; charno += yyleng;return DIVSTAR; }
 "<"|"<="|">"|>=		{ charno += yyleng;return ORDER; }
 ==|!=			{ charno += yyleng;return EQ; }
 int			{ charno += yyleng; strcpy(yylval.string, yytext); return SIMPLETYPE;}

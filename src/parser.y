@@ -29,14 +29,14 @@
 %token ORDER EQ
 %token <character> ADDSUB
 %token <character> DIVSTAR
-%token OR AND STRUCT IF WHILE RETURN VOID PRINT READC READE
+%token <string> OR AND STRUCT IF WHILE RETURN VOID PRINT READC READE
 %precedence ')'
 %precedence ELSE
 
 %type <node> DeclVars Declarateurs Type TypesVars EnTeteFonct
 %type <node> DeclFoncts DeclFonct Parametres Corps ListTypVar Prog
-%type <node> DeclChamps //SuiteInstr Instr
-//%type <node> F T E M TB FB Exp
+%type <node> DeclChamps SuiteInstr Instr
+%type <node> F T E M TB FB Exp LValue ListExp Arguments
 
 %%
 
@@ -156,7 +156,7 @@ ListTypVar:
 Corps: '{' DeclVars SuiteInstr '}'  {
                                         $$ = makeNode(Corps);
                                         addChild($$, $2);
-                                        //addChild($$, $3);
+                                        addChild($$, $3);
                                     }
     ;
 DeclVars:
@@ -176,104 +176,157 @@ DeclVars:
                                         }
     ;
 SuiteInstr:
-       SuiteInstr Instr     {
-                                //$$ = $1;
-                                //addChild($$, $2);
-                            }
-    |  %empty               {
-                                //$$ = makeNode(SuiteInstr);
-                            }
+       SuiteInstr Instr                   {
+                                              $$ = $1;
+                                              addChild($$, $2);
+                                          }
+    |  %empty                             {
+                                              $$ = makeNode(SuiteInstr);
+                                          }
     ;
 Instr:
-       LValue '=' Exp ';'
-    |  READE '(' LValue ')' ';'
-    |  READC '(' LValue ')' ';'
-    |  PRINT '(' Exp ')' ';'
+           LValue '=' Exp ';'             {
+                                              $$ = makeNode(Assignement);
+                                              $$->u.character = '=';
+                                              addChild($$, $1);
+                                              addSibling($1, $3);
+                                          }
+    |  READE '(' LValue ')' ';'           {
+                                              $$ = makeNode(Func);
+                                              strcpy($$->u.identifier, $1);
+                                              addChild($$, $3);
+                                          }
+    //INSTR -> IF -> EXP -> INSTR
+    |  READC '(' LValue ')' ';'           {
+                                              $$ = makeNode(Func);
+                                              strcpy($$->u.identifier, $1);
+                                              addChild($$, $3);
+                                          }
+    |  PRINT '(' Exp ')' ';'              {
+                                              $$ = makeNode(Func);
+                                              strcpy($$->u.identifier, $1);
+                                              addChild($$, $3);
+                                          }
     |  IF '(' Exp ')' Instr
     |  IF '(' Exp ')' Instr ELSE Instr
     |  WHILE '(' Exp ')' Instr
-    |  Exp ';'              {
-                                //$$ = $1;
-                            }
+    |  Exp ';'                            {
+                                              $$ = $1;
+                                          }
     |  RETURN Exp ';'
     |  RETURN ';'
-    |  '{' SuiteInstr '}'
+    |  '{' SuiteInstr '}'                 {
+                                              $$ = $2;
+                                          }
     |  ';'
     ;
 Exp :  Exp OR TB
-    |  TB                    {
-                                //$$ = $1;
-                             }
+    |  TB                                 {
+                                              $$ = $1;
+                                          }
     ;
 TB  :  TB AND FB
-    |  FB                    {
-                                //$$ = $1;
-                             }
+    |  FB                                 {
+                                              $$ = $1;
+                                          }
     ;
 FB  :  FB EQ M
-    |  M                     {
-                                  //$$ = $1;
-                             }
+    |  M                                  {
+                                              $$ = $1;
+                                          }
     ;
 M   :  M ORDER E
-    |  E                     {
-                                  //$$ = $1;
-                             }
+    |  E                                  {
+                                              $$ = $1;
+                                          }
     ;
-E   :  E ADDSUB T            {
-                                  //$$ = makeNode(Operator);
-                                  //$$->u.identifier[0] = $2;
-                                  //$$->u.identifier[1] = '\0';
-                                  //addChild($$, $1);
-                                  //addSibling($1, $3);
-                             }
-    |  T                     {
-                                  //$$ = $1;
-                             }
+E   :  E ADDSUB T                         {
+                                              $$ = makeNode(Operator);
+                                              $$->u.identifier[0] = $2;
+                                              $$->u.identifier[1] = '\0';
+                                              addChild($$, $1);
+                                              addSibling($1, $3);
+                                         }
+    |  T                                 {
+                                              $$ = $1;
+                                         }
     ;
-T   :  T DIVSTAR F           {
-                                  //$$ = makeNode(Operator);
-                                  //$$->u.identifier[0] = $2;
-                                  //$$->u.identifier[1] = '\0';
-                                  //addChild($$, $1);
-                                  //addSibling($1, $3);
-                             }
-    |  F                     {
-                                  //$$ = $1;
-                             }
+T   :  T DIVSTAR F                       {
+                                              $$ = makeNode(Operator);
+                                              $$->u.identifier[0] = $2;
+                                              $$->u.identifier[1] = '\0';
+                                              addChild($$, $1);
+                                              addSibling($1, $3);
+                                         }
+    |  F                                 {
+                                              $$ = $1;
+                                         }
     ;
-F   :  ADDSUB F               {
-                                  //$$ = makeNode(UnaryOperator);
-                                  //$$->u.character = $1;
-                                  //addChild($$, $2);
-                              }
-    |  '!' F                  {}
-    |  '&' IDENT              {}
-    |  '(' Exp ')'            {
-                                  //$$ = $2;
-                              }
-    |  NUM                    {
-                                  //$$ = makeNode(IntLiteral);
-                                  //$$->u.integer = $1;
-                              }
-    |  CHARACTER              {
-                                  //$$ = makeNode(CharLiteral);
-                                  //$$->u.character = $1;
-                              }
-    |  LValue
-    |  IDENT '(' Arguments  ')'
+F   :  ADDSUB F                          {
+                                              $$ = makeNode(UnaryOperator);
+                                              $$->u.character = $1;
+                                              addChild($$, $2);
+                                          }
+    |  '!' F                              {
+                                              $$ = makeNode(UnaryOperator);
+                                              $$->u.character = '!';
+                                              addChild($$, $2);
+                                          }
+    |  '&' IDENT                          {
+                                              $$ = makeNode(UnaryOperator);
+                                              $$->u.character = '&';
+                                              Node *ident = makeIdentifier($2);
+                                              addChild($$, ident);
+                                          }
+    |  '(' Exp ')'                        {
+                                              $$ = $2;
+                                          }
+    |  NUM                                {
+                                              $$ = makeNode(IntLiteral);
+                                              $$->u.integer = $1;
+                                          }
+    |  CHARACTER                          {
+                                              $$ = makeNode(CharLiteral);
+                                              $$->u.character = $1;
+                                          }
+    |  LValue                             {
+                                              $$ = $1;
+                                          }
+    |  IDENT '(' Arguments  ')'           {
+                                              $$ = makeNode(Func);
+                                              strcpy($$->u.identifier, $1);
+                                              addChild($$, $3);
+                                          }
     ;
 LValue:
-       IDENT
-    |  IDENT '.' IDENT
+       IDENT                              {
+                                              $$ = makeIdentifier($1);
+                                          }
+    |  IDENT '.' IDENT                    {
+                                              $$ = makeNode(StructAccess);
+                                              $$->u.character = '.';
+                                              Node *ident1 = makeIdentifier($1);
+                                              Node *ident2 = makeIdentifier($3);
+                                              addChild($$, ident1);
+                                              addSibling($$, ident2);
+                                          }
     ;
 Arguments:
-       ListExp
-    |  %empty
+       ListExp                            {
+                                              $$ = $1;
+                                          }
+    |  %empty                             {
+                                              $$ = makeNode(Arguments);
+                                          }
     ;
 ListExp:
-       ListExp ',' Exp
-    |  Exp
+       ListExp ',' Exp                    {
+                                              $$ = $1;
+                                              addChild($$, $3);
+                                          }
+    |  Exp                                {
+                                              $$ = $1;
+                                          }
     ;
 
 %%

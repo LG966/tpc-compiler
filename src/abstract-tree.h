@@ -22,8 +22,11 @@ typedef enum {
   DeclChamps,
   DeclStruct,
   UnaryOperator,
-  Operator
-
+  Operator,
+  Assignement,
+  Func,
+  Arguments,
+  StructAccess
 
   /* and allother node labels */
   /* The list must coincide with the strings in abstract-tree.c */

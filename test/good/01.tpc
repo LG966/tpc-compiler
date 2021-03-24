@@ -1,0 +1,8 @@
+/* test-table-symboles.tpc */
+
+void main(void){
+        !(instr);
+        READC(gfe);
+        READE(lop);
+        PRINT(5*8 + 6);
+}
