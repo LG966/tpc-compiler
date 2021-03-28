@@ -207,18 +207,39 @@ Instr:
                                               strcpy($$->u.identifier, $1);
                                               addChild($$, $3);
                                           }
-    |  IF '(' Exp ')' Instr
-    |  IF '(' Exp ')' Instr ELSE Instr
-    |  WHILE '(' Exp ')' Instr
+    |  IF '(' Exp ')' Instr               {
+                                              $$ = makeNode(LoneIf);
+                                              addChild($$, $3); 
+                                              addChild($$, $5);
+                                          }
+    |  IF '(' Exp ')' Instr ELSE Instr    {
+                                              $$ = makeNode(IfElse);
+                                              addChild($$, $3); //condition 
+                                              addChild($$, $5); // instr if true
+                                              addChild($$, $7); // else instr 
+                                          }
+    |  WHILE '(' Exp ')' Instr            {
+                                              $$ = makeNode(While);
+                                              addChild($$, $3);
+                                              addChild($$, $5); 
+                                          }
     |  Exp ';'                            {
                                               $$ = $1;
                                           }
-    |  RETURN Exp ';'
-    |  RETURN ';'
+    |  RETURN Exp ';'                     {
+                                              $$ = makeNode(Return);
+                                              addChild($$, $2);
+                                          }
+    |  RETURN ';'                         {
+                                              $$ = makeNode(Return);
+                                              addChild($$, makeNode(Void));
+                                          }
     |  '{' SuiteInstr '}'                 {
                                               $$ = $2;
                                           }
-    |  ';'
+    |  ';'                                {
+                                              $$ = makeNode(Void);
+                                          }
     ;
 Exp :  Exp OR TB
     |  TB                                 {
@@ -241,7 +262,7 @@ M   :  M ORDER E
                                           }
     ;
 E   :  E ADDSUB T                         {
-                                              $$ = makeNode(Operator);
+                                              $$ = makeNode(BinaryOperator);
                                               $$->u.identifier[0] = $2;
                                               $$->u.identifier[1] = '\0';
                                               addChild($$, $1);
@@ -252,7 +273,7 @@ E   :  E ADDSUB T                         {
                                          }
     ;
 T   :  T DIVSTAR F                       {
-                                              $$ = makeNode(Operator);
+                                              $$ = makeNode(BinaryOperator);
                                               $$->u.identifier[0] = $2;
                                               $$->u.identifier[1] = '\0';
                                               addChild($$, $1);
@@ -313,16 +334,17 @@ LValue:
     ;
 Arguments:
        ListExp                            {
-                                              $$ = $1;
+                                              $$ = makeNode(Arguments);
+                                              addChild($$, $1);
                                           }
     |  %empty                             {
-                                              $$ = makeNode(Arguments);
+                                              $$ = makeNode(Void);
                                           }
     ;
 ListExp:
        ListExp ',' Exp                    {
                                               $$ = $1;
-                                              addChild($$, $3);
+                                              addSibling($$, $3);
                                           }
     |  Exp                                {
                                               $$ = $1;

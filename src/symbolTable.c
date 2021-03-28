@@ -7,8 +7,9 @@ int STsize=0;
 
 void printSymbols(){
     int i;
+    printf("%%--- Symbol table ---%%\n");
     for(i=0; i!=STsize; i++){
-        printf("%d -- %s of type %s\n", i, symbolTable[i].name, symbolTable[i].type);
+        printf("\t%d -- %s of type %s\n", i, symbolTable[i].name, symbolTable[i].type);
     }
 }
 

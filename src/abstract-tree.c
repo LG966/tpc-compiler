@@ -27,11 +27,15 @@ static const char *StringFromKind[] = {
   "DeclChamps",
   "DeclStruct",
   "UnaryOperator",
-  "Operator",
+  "BinaryOperator",
   "Assignement",
   "Func",
   "Arguments",
-  "StructAccess"
+  "StructAccess",
+  "LoneIf",
+  "IfElse",
+  "While",
+  "Return"
   /* and all other node labels */
   /* The list must coincide with the enum in abstract-tree.h */
   /* To avoid listing them twice, see https://stackoverflow.com/a/10966395 */
@@ -95,7 +99,7 @@ void printTree(Node *node) {
     case StructType:
     case Type : printf(": %s", node->u.type); break;
     case UnaryOperator : printf(": '%c'", node->u.character); break;
-    case Operator : printf(": %s", node->u.identifier); break;
+    case BinaryOperator : printf(": %s", node->u.identifier); break;
     case Func : printf(": %s", node->u.identifier); break;
     default: break;
   }
