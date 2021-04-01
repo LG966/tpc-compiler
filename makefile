@@ -13,9 +13,9 @@ vpath %.c $(SRCPATH)
 vpath %.h $(SRCPATH)
 vpath %.y $(SRCPATH)
 vpath %.lex $(SRCPATH)
-vpath %.o $(BINPATH)  
+vpath %.o $(BINPATH)
 
-all: addFolders $(EXEC) 
+all: addFolders $(EXEC)
 
 addFolders:
 	mkdir -p $(EXECPATH) $(BINPATH)
@@ -24,19 +24,21 @@ $(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o
 	$(CC) -o $(EXECPATH)$@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
 
 parser.tab.c: parser.y
-	bison --defines=$(SRCPATH)parser.tab.h -o $(SRCPATH)parser.tab.c $<  
+	bison --defines=$(SRCPATH)parser.tab.h -o $(SRCPATH)parser.tab.c $<
 
 lex.yy.c: lexer.lex
-	flex -o $(SRCPATH)lex.yy.c $< 
+	flex -o $(SRCPATH)lex.yy.c $<
 
 parser.tab.o: parser.tab.c abstract-tree.h
 
 abstract-tree.o: abstract-tree.c abstract-tree.h
 
-symbolTable.o: symbolTable.h symbolTable.c
+symbolTable.o: symbolTable.c symbolTable.h
+
+gen_code_asm.o: gen_code_asm.c gen_code_asm.h
 
 %.o: %.c
-	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS) 
+	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS)
 
 clean:
 	rm -f $(BINPATH)*.o

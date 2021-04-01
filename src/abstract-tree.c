@@ -35,6 +35,7 @@ static const char *StringFromKind[] = {
   "LoneIf",
   "IfElse",
   "While",
+  "BoolOperator",
   "Return"
   /* and all other node labels */
   /* The list must coincide with the enum in abstract-tree.h */

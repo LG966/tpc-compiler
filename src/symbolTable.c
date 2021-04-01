@@ -2,7 +2,7 @@
 
 #define MAXSYMBOLS 256
 STentry *symbolTable;
-int STsize=0; 
+int STsize=0;
 
 
 void printSymbols(){
@@ -26,8 +26,8 @@ int addVar(const char name[], const char type[]){
         /* printf("too many variables near line %d\n", lineno);
         exit(1); */ return 2;
     }
-    strncpy(symbolTable[STsize-1].name, name, MAXNAME -1);
-    strncpy(symbolTable[STsize-1].type, type, MAXTYPE -1);
+    strncpy(symbolTable[STsize - 1].name, name, MAXNAME - 1);
+    strncpy(symbolTable[STsize - 1].type, type, MAXTYPE - 1);
 
     return 0;
 }

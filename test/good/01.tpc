@@ -5,4 +5,12 @@ void main(void){
         READC(gfe);
         READE(lop);
         PRINT(5*8 + 6);
+        D = a && b;
+        if (((a && b) || c) && (g <= e)) {
+            a ='k';
+        }
+        else{
+            a = 5;
+        }
+        return a;
 }

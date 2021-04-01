@@ -1,0 +1,20 @@
+/* gen-code-types.tpc */
+
+/* Test file for TPC */
+    int somme,produit,quotient,reste,difference ;
+    char letter, digit, punct;
+	int *p_compteur;
+	int indice, *p_indice;
+    
+int main(void)  {
+   somme=12;
+   produit=24;
+   quotient=24/12;
+   letter='c';
+   digit='0';
+   letter=letter+('A'-'a');
+   print(quotient);
+   print(letter);
+   print('\n');
+   return 0;
+}

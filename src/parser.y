@@ -7,6 +7,7 @@
   #include "symbolTable.h"
   extern int lineno;
   extern int charno;
+  extern char text_line[100];
   int yylex();
   void yyerror(const char *);
   Node * makeIdentifier(char * ident_name);
@@ -26,7 +27,7 @@
 %token <num> NUM
 %token <string> IDENT
 %token <string> SIMPLETYPE
-%token ORDER EQ
+%token <string> ORDER EQ
 %token <character> ADDSUB
 %token <character> DIVSTAR
 %token <string> OR AND STRUCT IF WHILE RETURN VOID PRINT READC READE
@@ -196,7 +197,7 @@ Instr:
                                               strcpy($$->u.identifier, $1);
                                               addChild($$, $3);
                                           }
-    //INSTR -> IF -> EXP -> INSTR
+
     |  READC '(' LValue ')' ';'           {
                                               $$ = makeNode(Func);
                                               strcpy($$->u.identifier, $1);
@@ -209,19 +210,19 @@ Instr:
                                           }
     |  IF '(' Exp ')' Instr               {
                                               $$ = makeNode(LoneIf);
-                                              addChild($$, $3); 
+                                              addChild($$, $3);
                                               addChild($$, $5);
                                           }
     |  IF '(' Exp ')' Instr ELSE Instr    {
                                               $$ = makeNode(IfElse);
-                                              addChild($$, $3); //condition 
+                                              addChild($$, $3); //condition
                                               addChild($$, $5); // instr if true
-                                              addChild($$, $7); // else instr 
+                                              addChild($$, $7); // else instr
                                           }
     |  WHILE '(' Exp ')' Instr            {
                                               $$ = makeNode(While);
                                               addChild($$, $3);
-                                              addChild($$, $5); 
+                                              addChild($$, $5);
                                           }
     |  Exp ';'                            {
                                               $$ = $1;
@@ -241,22 +242,42 @@ Instr:
                                               $$ = makeNode(Void);
                                           }
     ;
-Exp :  Exp OR TB
+Exp :  Exp OR TB                          {
+                                              $$ = makeNode(BoolOperator);
+                                              strcpy($$->u.identifier, $2);
+                                              addChild($$, $1);
+                                              addSibling($1, $3);
+                                          }
     |  TB                                 {
                                               $$ = $1;
                                           }
     ;
-TB  :  TB AND FB
+TB  :  TB AND FB                          {
+                                              $$ = makeNode(BoolOperator);
+                                              strcpy($$->u.identifier, $2);
+                                              addChild($$, $1);
+                                              addSibling($1, $3);
+                                          }
     |  FB                                 {
                                               $$ = $1;
                                           }
     ;
-FB  :  FB EQ M
+FB  :  FB EQ M                          {
+                                              $$ = makeNode(BoolOperator);
+                                              strcpy($$->u.identifier, $2);
+                                              addChild($$, $1);
+                                              addSibling($1, $3);
+                                          }
     |  M                                  {
                                               $$ = $1;
                                           }
     ;
-M   :  M ORDER E
+M   :  M ORDER E                          {
+                                              $$ = makeNode(BoolOperator);
+                                              strcpy($$->u.identifier, $2);
+                                              addChild($$, $1);
+                                              addSibling($1, $3);
+                                          }
     |  E                                  {
                                               $$ = $1;
                                           }
@@ -360,10 +381,21 @@ int main(int argc, char** argv) {
     printSymbols();
 	return rtr;
 }
+void display_error(){
+	int index;
+	for(index = 0; index < charno - 1; index++){
+		if(text_line[index] == '\t')
+			printf("\t");
+		else
+			printf(" ");
+	}
+	printf("^\n");
+}
 
-void yyerror(const char *s){
-	fprintf(stderr, "%s near line %d character %d\n", s, lineno,charno);
-
+void yyerror(const char *s) {
+	printf("Erreur à la ligne %d colonne %d!\n", lineno, charno);
+	printf("%s\n", text_line);
+	display_error();
 }
 
 Node * makeIdentifier(char * ident_name){

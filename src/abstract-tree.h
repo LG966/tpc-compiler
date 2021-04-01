@@ -30,6 +30,7 @@ typedef enum {
   LoneIf,
   IfElse,
   While,
+  BoolOperator,
   Return
 
   /* and allother node labels */
