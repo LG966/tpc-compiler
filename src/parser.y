@@ -5,6 +5,7 @@
   #include "abstract-tree.h"
   #include <string.h>
   #include "symbolTable.h"
+  #include "operator.h"
   extern int lineno;
   extern int charno;
   extern char text_line[100];
@@ -27,16 +28,16 @@
 %token <num> NUM
 %token <string> IDENT
 %token <string> SIMPLETYPE
-%token <string> ORDER EQ
-%token <character> ADDSUB
-%token <character> DIVSTAR
-%token <string> OR AND STRUCT IF WHILE RETURN VOID PRINT READC READE
+%token <node> ORDER EQ
+%token <node> ADDSUB
+%token <node> DIVSTAR OR AND
+%token <string> STRUCT IF WHILE RETURN VOID PRINT READC READE
 %precedence ')'
 %precedence ELSE
 
 %type <node> DeclVars Declarateurs Type TypesVars EnTeteFonct
 %type <node> DeclFoncts DeclFonct Parametres Corps ListTypVar Prog
-%type <node> DeclChamps SuiteInstr Instr
+%type <node> DeclChamps SuiteInstr Instr 
 %type <node> F T E M TB FB Exp LValue ListExp Arguments
 
 %%
@@ -45,7 +46,10 @@ Prog:  TypesVars DeclFoncts     {
                                     $$ = makeNode(Program);
                                     addChild($$, $1);
                                     addChild($$, $2);
-                                    printTree($$);}
+                                    puts("Global Symbol Table");
+                                    printglobalST();
+                                    printTree($$);
+                                }
     ;
 TypesVars:
        TypesVars Type Declarateurs ';'      {
@@ -55,7 +59,7 @@ TypesVars:
                                                 for(Node * ident = FIRSTCHILD($3); ident != NULL; ident = SIBLING(ident))
                                                 {
                                                     /* printf("ident :%s - type :%s\n", ident->u.identifier, $2->u.type); */
-                                                    addVar(ident->u.identifier, $2->u.type);
+                                                    addglobalVar(ident->u.identifier, $2->u.type);
                                                 }
                                             }
     |  TypesVars STRUCT IDENT '{' DeclChamps '}' ';'    {
@@ -118,6 +122,9 @@ DeclFonct:
                                     $$ = makeNode(DeclFonct);
                                     addChild($$, $1);
                                     addChild($$, $2);
+                                    printf("func %s Symbol Table\n", SECONDCHILD($1)->u.identifier);
+                                    printfuncST();
+                                    emptyfuncST();
                                 }
     ;
 EnTeteFonct:
@@ -158,6 +165,8 @@ Corps: '{' DeclVars SuiteInstr '}'  {
                                         $$ = makeNode(Corps);
                                         addChild($$, $2);
                                         addChild($$, $3);
+                                       
+
                                     }
     ;
 DeclVars:
@@ -165,11 +174,11 @@ DeclVars:
                                             $$ = $1;
                                             addChild($$, $2);
                                             addChild($2, $3);
-
+                                            
                                             for(Node * ident = FIRSTCHILD($3); ident != NULL; ident = SIBLING(ident))
                                             {
                                                 /* printf("ident :%s - type :%s\n", ident->u.identifier, $2->u.type); */
-                                                addVar(ident->u.identifier, $2->u.type);
+                                                addfuncVar(ident->u.identifier, $2->u.type);
                                             }
                                         }
     |  %empty                           {
@@ -243,8 +252,7 @@ Instr:
                                           }
     ;
 Exp :  Exp OR TB                          {
-                                              $$ = makeNode(BoolOperator);
-                                              strcpy($$->u.identifier, $2);
+                                              $$ = $2;
                                               addChild($$, $1);
                                               addSibling($1, $3);
                                           }
@@ -253,8 +261,7 @@ Exp :  Exp OR TB                          {
                                           }
     ;
 TB  :  TB AND FB                          {
-                                              $$ = makeNode(BoolOperator);
-                                              strcpy($$->u.identifier, $2);
+                                              $$ = $2;
                                               addChild($$, $1);
                                               addSibling($1, $3);
                                           }
@@ -262,9 +269,8 @@ TB  :  TB AND FB                          {
                                               $$ = $1;
                                           }
     ;
-FB  :  FB EQ M                          {
-                                              $$ = makeNode(BoolOperator);
-                                              strcpy($$->u.identifier, $2);
+FB  :  FB EQ M                            {
+                                              $$ = $2;
                                               addChild($$, $1);
                                               addSibling($1, $3);
                                           }
@@ -273,8 +279,7 @@ FB  :  FB EQ M                          {
                                           }
     ;
 M   :  M ORDER E                          {
-                                              $$ = makeNode(BoolOperator);
-                                              strcpy($$->u.identifier, $2);
+                                              $$ = $2;
                                               addChild($$, $1);
                                               addSibling($1, $3);
                                           }
@@ -283,9 +288,7 @@ M   :  M ORDER E                          {
                                           }
     ;
 E   :  E ADDSUB T                         {
-                                              $$ = makeNode(BinaryOperator);
-                                              $$->u.identifier[0] = $2;
-                                              $$->u.identifier[1] = '\0';
+                                              $$ = $2;
                                               addChild($$, $1);
                                               addSibling($1, $3);
                                          }
@@ -294,9 +297,7 @@ E   :  E ADDSUB T                         {
                                          }
     ;
 T   :  T DIVSTAR F                       {
-                                              $$ = makeNode(BinaryOperator);
-                                              $$->u.identifier[0] = $2;
-                                              $$->u.identifier[1] = '\0';
+                                              $$ = $2;
                                               addChild($$, $1);
                                               addSibling($1, $3);
                                          }
@@ -305,18 +306,18 @@ T   :  T DIVSTAR F                       {
                                          }
     ;
 F   :  ADDSUB F                          {
-                                              $$ = makeNode(UnaryOperator);
-                                              $$->u.character = $1;
+                                              $$ = $1;
+                                              $$->kind = UnaryOperator; // Binary par défaut, on doit changer
                                               addChild($$, $2);
                                           }
     |  '!' F                              {
                                               $$ = makeNode(UnaryOperator);
-                                              $$->u.character = '!';
+                                              $$->u.operator = Not;
                                               addChild($$, $2);
                                           }
     |  '&' IDENT                          {
                                               $$ = makeNode(UnaryOperator);
-                                              $$->u.character = '&';
+                                              $$->u.operator = Addressof;
                                               Node *ident = makeIdentifier($2);
                                               addChild($$, ident);
                                           }
@@ -376,11 +377,10 @@ ListExp:
 
 int main(int argc, char** argv) {
     int rtr;
-    initSymbolTable();
     rtr = yyparse();
-    printSymbols();
 	return rtr;
 }
+
 void display_error(){
 	int index;
 	for(index = 0; index < charno - 1; index++){

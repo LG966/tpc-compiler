@@ -15,13 +15,12 @@ vpath %.y $(SRCPATH)
 vpath %.lex $(SRCPATH)
 vpath %.o $(BINPATH)
 
-all: addFolders $(EXEC)
+.PHONY : all
 
-addFolders:
-	mkdir -p $(EXECPATH) $(BINPATH)
+all: addFolders $(EXECPATH)$(EXEC)
 
-$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o
-	$(CC) -o $(EXECPATH)$@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
+$(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o
+	$(CC) -o $@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
 
 parser.tab.c: parser.y
 	bison --defines=$(SRCPATH)parser.tab.h -o $(SRCPATH)parser.tab.c $<
@@ -29,16 +28,26 @@ parser.tab.c: parser.y
 lex.yy.c: lexer.lex
 	flex -o $(SRCPATH)lex.yy.c $<
 
-parser.tab.o: parser.tab.c abstract-tree.h
+parser.tab.o: parser.tab.c abstract-tree.h operator.o
 
-abstract-tree.o: abstract-tree.c abstract-tree.h
+abstract-tree.o: abstract-tree.c abstract-tree.h operator.o
 
 symbolTable.o: symbolTable.c symbolTable.h
 
 gen_code_asm.o: gen_code_asm.c gen_code_asm.h
 
+operator.o: operator.c operator.h
+
 %.o: %.c
 	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS)
+
+addFolders: | $(EXECPATH) $(BINPATH)
+	
+$(EXECPATH):
+	mkdir $(EXECPATH)
+
+$(BINPATH):
+	mkdir $(BINPATH)
 
 clean:
 	rm -f $(BINPATH)*.o

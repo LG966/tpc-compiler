@@ -17,11 +17,11 @@ int test (int param1, char param2, char param3){
 
 
 int main(void)  {
-   r1=12;
-   r2=24;
+   main_a=12;
+   main_a=24;
    b=r1+r2;
    punct='.';
-   notreco = 3;
+   notreco = 3 % 2;
    return b;
 
    if(true && false){

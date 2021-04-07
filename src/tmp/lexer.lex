@@ -10,10 +10,20 @@
   int charno=0;
   int index_text = 0;
   char text_line[100];
-  
-  #define MAKE_BIN_OPE {yylval.node = makeNode(BinaryOperator); \
-   yylval.node->u.operator = getOperatorFromString(yytext);} 
-
+  #define YY_INPUT(buf, result, max_size){ \
+		char c = fgetc(yyin); \
+		result = (c == EOF) ? YY_NULL : (buf[0] = c, 1); \
+		/* Vérifie si la ligne a déjà été enregistré */ \
+		if(index_text == 0){ \
+			while(c != EOF && c != '\n'){ \
+				text_line[index_text] = c; \
+				index_text++; \
+				c = fgetc(yyin); \
+			} \
+			text_line[index_text] = '\0'; \
+			fseek(yyin, -index_text, SEEK_CUR); \
+		} \
+	}
 %}
 
 
@@ -24,12 +34,12 @@
 \n			{charno=0; index_text = 0; lineno++;}
 "/*"			{ charno += yyleng;BEGIN LONG_COMMENT; }
 "//"			{ charno += yyleng;BEGIN SHORT_COMMENT; }
-"&&"			{ charno += yyleng; MAKE_BIN_OPE; return AND; }
-"||"			{ charno += yyleng; MAKE_BIN_OPE; return OR; }
-"+"|-			{ charno += yyleng; MAKE_BIN_OPE; return ADDSUB;}
-"*"|"/"|"%"			{ charno += yyleng; MAKE_BIN_OPE; return DIVSTAR; }
-"<"|"<="|">"|">="		{ charno += yyleng; MAKE_BIN_OPE; return ORDER; }
-==|!=			{ charno += yyleng;  MAKE_BIN_OPE; return EQ; }
+"&&"			{ charno += yyleng; strcpy(yylval.string, yytext); return AND; }
+"||"			{ charno += yyleng; strcpy(yylval.string, yytext); return OR; }
+"+"|-			{ yylval.character=yytext[0]; charno += yyleng; return ADDSUB; }
+"*"|"/"|"%"			{ yylval.character=yytext[0]; charno += yyleng;return DIVSTAR; }
+"<"|"<="|">"|">="		{ charno += yyleng; strcpy(yylval.string, yytext); return ORDER; }
+==|!=			{ charno += yyleng; strcpy(yylval.string, yytext); return EQ; }
 int			{ charno += yyleng; strcpy(yylval.string, yytext); return SIMPLETYPE;}
 char		{ charno += yyleng; strcpy(yylval.string, yytext); return SIMPLETYPE;}
 print			{ charno += yyleng;return PRINT; }

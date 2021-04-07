@@ -83,7 +83,6 @@ void deleteTree(Node *node) {
 }
 
 void printTree(Node *node) {
-  //fprintf(stderr, "pointer = %p, stack = %p\n", child, __builtin_return_address(0));
   static bool rightmost[128]; // current node is rightmost sibling
   static int depth = 0;       // depth of current node
   for (int i = 1; i < depth; i++) { // 2502 = vertical line
@@ -99,8 +98,8 @@ void printTree(Node *node) {
     case Identifier: printf(": %s", node->u.identifier); break;
     case StructType:
     case Type : printf(": %s", node->u.type); break;
-    case UnaryOperator : printf(": '%c'", node->u.character); break;
-    case BinaryOperator : printf(": %s", node->u.identifier); break;
+    case UnaryOperator : 
+    case BinaryOperator : printf(": %s", getStringFromOperator(node->u.operator)); break;
     case Func : printf(": %s", node->u.identifier); break;
     default: break;
   }

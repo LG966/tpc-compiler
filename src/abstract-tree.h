@@ -1,15 +1,17 @@
 /* abstract-tree.h */
 
+#include "operator.h"
+
 typedef enum {
-  Program = 0,
-  VarDeclList = 1,
-  Identifier = 2,
-  CharLiteral = 3,
-  IntLiteral = 4,
-  DeclVars = 5,
-  Type = 6,
-  StructType = 7,
-  Declarateurs = 8,
+  Program,
+  VarDeclList,
+  Identifier,
+  CharLiteral,
+  IntLiteral,
+  DeclVars,
+  Type,
+  StructType,
+  Declarateurs,
   TypesVars,
   DeclFoncts,
   DeclFonct,
@@ -33,9 +35,6 @@ typedef enum {
   BoolOperator,
   Return
 
-  /* and allother node labels */
-  /* The list must coincide with the strings in abstract-tree.c */
-  /* To avoid listing them twice, see https://stackoverflow.com/a/10966395 */
 } Kind;
 
 typedef struct Node {
@@ -45,6 +44,7 @@ typedef struct Node {
     char character;
     char identifier[64];
     char type[64];
+    Operator operator;
   } u;
   struct Node *firstChild, *nextSibling;
   int lineno;

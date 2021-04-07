@@ -13,9 +13,11 @@ typedef struct {
     char type[MAXTYPE]; // devrait avoir un enum consacré aux types
 } STentry;
 
-int addVar(const char name[], const char type[]);
-void printSymbols();
-void initSymbolTable();
+int addfuncVar(const char name[], const char type[]);
+int addglobalVar(const char name[], const char type[]);
+void printglobalST();
+void printfuncST();
+void emptyfuncST();
 
 
 #endif
