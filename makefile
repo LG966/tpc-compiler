@@ -17,7 +17,7 @@ vpath %.o $(BINPATH)
 
 .PHONY : all
 
-all: addFolders $(EXECPATH)$(EXEC)
+all: addFolders $(EXECPATH)$(EXEC) clean
 
 $(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o
 	$(CC) -o $@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
@@ -42,7 +42,7 @@ operator.o: operator.c operator.h
 	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS)
 
 addFolders: | $(EXECPATH) $(BINPATH)
-	
+
 $(EXECPATH):
 	mkdir $(EXECPATH)
 
@@ -56,6 +56,7 @@ clean:
 
 mrproper: clean
 	rm -f $(EXECPATH)$(EXEC)
+	rm -f comp.asm
 
 tar:
 	cd ..; tar -czf $(CURRENT_DIR).tar.gz $(CURRENT_DIR)

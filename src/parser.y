@@ -6,6 +6,7 @@
   #include <string.h>
   #include "symbolTable.h"
   #include "operator.h"
+  #include "gen_code_asm.h"
   extern int lineno;
   extern int charno;
   extern char text_line[100];
@@ -37,7 +38,7 @@
 
 %type <node> DeclVars Declarateurs Type TypesVars EnTeteFonct
 %type <node> DeclFoncts DeclFonct Parametres Corps ListTypVar Prog
-%type <node> DeclChamps SuiteInstr Instr 
+%type <node> DeclChamps SuiteInstr Instr
 %type <node> F T E M TB FB Exp LValue ListExp Arguments
 
 %%
@@ -165,7 +166,7 @@ Corps: '{' DeclVars SuiteInstr '}'  {
                                         $$ = makeNode(Corps);
                                         addChild($$, $2);
                                         addChild($$, $3);
-                                       
+
 
                                     }
     ;
@@ -174,7 +175,7 @@ DeclVars:
                                             $$ = $1;
                                             addChild($$, $2);
                                             addChild($2, $3);
-                                            
+
                                             for(Node * ident = FIRSTCHILD($3); ident != NULL; ident = SIBLING(ident))
                                             {
                                                 /* printf("ident :%s - type :%s\n", ident->u.identifier, $2->u.type); */
@@ -378,7 +379,8 @@ ListExp:
 int main(int argc, char** argv) {
     int rtr;
     rtr = yyparse();
-	return rtr;
+    begin_data_asm(globalST);
+	  return rtr;
 }
 
 void display_error(){

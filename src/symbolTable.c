@@ -1,7 +1,5 @@
 #include "symbolTable.h"
 
-#define MAXSYMBOLS 256
-
 STentry globalST[MAXSYMBOLS];
 STentry funcST[MAXSYMBOLS];
 

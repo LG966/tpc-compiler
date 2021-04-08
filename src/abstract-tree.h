@@ -1,4 +1,6 @@
 /* abstract-tree.h */
+#ifndef __ABSTRACT_TREE__
+#define __ABSTRACT_TREE__
 
 #include "operator.h"
 
@@ -60,3 +62,5 @@ void printTree(Node *node);
 #define SECONDCHILD(node) node->firstChild->nextSibling
 #define THIRDCHILD(node) node->firstChild->nextSibling->nextSibling
 #define SIBLING(node) node->nextSibling
+
+#endif
