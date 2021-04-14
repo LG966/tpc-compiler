@@ -6,6 +6,8 @@
   #include <string.h>
   #include "symbolTable.h"
   #include "operator.h"
+  #include "type.h"
+  #include "struct.h"
   #include "gen_code_asm.h"
   extern int lineno;
   extern int charno;
@@ -13,7 +15,6 @@
   int yylex();
   void yyerror(const char *);
   Node * makeIdentifier(char * ident_name);
-  Node * makeSimpleType(char * type_name);
 %}
 
 
@@ -28,7 +29,7 @@
 %token <character> CHARACTER
 %token <num> NUM
 %token <string> IDENT
-%token <string> SIMPLETYPE
+%token <node> SIMPLETYPE
 %token <node> ORDER EQ
 %token <node> ADDSUB
 %token <node> DIVSTAR OR AND
@@ -47,8 +48,8 @@ Prog:  TypesVars DeclFoncts     {
                                     $$ = makeNode(Program);
                                     addChild($$, $1);
                                     addChild($$, $2);
-                                    puts("Global Symbol Table");
                                     printglobalST();
+                                    printStructs();
                                     printTree($$);
                                 }
     ;
@@ -69,16 +70,21 @@ TypesVars:
                                                             // les déclarations de struct des déclarations
                                                             // de variable de type struct
                                                             // Peut-être pas nécessaire
+
                                                             Node * declstruct = makeNode(DeclStruct);
                                                             addChild($$, declstruct);
                                                             addChild(declstruct, makeIdentifier($3));
                                                             addChild(declstruct, $5);
+
+                                                            if(addStructDecl(declstruct) != 0){
+                                                                printf("Erreur dans la déclaration d'une structure\n");
+                                                            }
                                                         }
     |  %empty                                           {$$ = makeNode(TypesVars);}
     ;
 Type:
-       SIMPLETYPE       {$$ = makeNode(Type); strcpy($$->u.type, $1);}
-    |  STRUCT IDENT     {$$ = makeNode(StructType); strcpy($$->u.type, $2);}
+       SIMPLETYPE       {/* $$ = makeNode(Type); strcpy($$->u.type, $1); */;}
+    |  STRUCT IDENT     {$$ = makeNode(StructType); strcpy($$->u.identifier, $2);}
     ;
 Declarateurs:
        Declarateurs ',' IDENT {
@@ -97,15 +103,13 @@ Declarateurs:
 DeclChamps :
        DeclChamps SIMPLETYPE Declarateurs ';'   {
                                                     $$ = $1;
-                                                    Node * type = makeSimpleType($2);
-                                                    addChild($$, type);
-                                                    addChild(type, $3);
+                                                    addChild($$, $2);
+                                                    addChild($2, $3);
                                                 }
     |  SIMPLETYPE Declarateurs ';'              {
                                                     $$ = makeNode(DeclChamps);
-                                                    Node * type = makeSimpleType($1);
-                                                    addChild($$, type);
-                                                    addChild(type, $2);
+                                                    addChild($$, $1);
+                                                    addChild($1, $2);
                                                 }
     ;
 DeclFoncts:
@@ -123,7 +127,7 @@ DeclFonct:
                                     $$ = makeNode(DeclFonct);
                                     addChild($$, $1);
                                     addChild($$, $2);
-                                    printf("func %s Symbol Table\n", SECONDCHILD($1)->u.identifier);
+                                    printf("\nfun %s -> ", SECONDCHILD($1)->u.identifier);
                                     printfuncST();
                                     emptyfuncST();
                                 }
@@ -404,10 +408,4 @@ Node * makeIdentifier(char * ident_name){
     Node * ident = makeNode(Identifier);
     strcpy(ident->u.identifier, ident_name);
     return ident;
-}
-
-Node * makeSimpleType(char * type_name){
-    Node * type = makeNode(Type);
-    strcpy(type->u.type, type_name);
-    return type;
 }

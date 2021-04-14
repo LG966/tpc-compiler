@@ -5,7 +5,7 @@
 	char letter, digit, punct;
 
 struct elephant{
-    int nbPattes;
+    int nbPattes, var2;
     char sexe;
 };
 

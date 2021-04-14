@@ -3,6 +3,9 @@
 #define __ABSTRACT_TREE__
 
 #include "operator.h"
+#include "type.h"
+
+extern int lineno;
 
 typedef enum {
   Program,
@@ -40,16 +43,16 @@ typedef enum {
 } Kind;
 
 typedef struct Node {
-  Kind kind;
-  union {
-    int integer;
-    char character;
-    char identifier[64];
-    char type[64];
-    Operator operator;
-  } u;
-  struct Node *firstChild, *nextSibling;
-  int lineno;
+    Kind kind;
+    union {
+        int integer;
+        char character;
+        char identifier[64];
+        Type_tpc type;
+        Operator operator;
+    } u;
+    struct Node *firstChild, *nextSibling;
+    int lineno;
 } Node;
 
 Node *makeNode(Kind kind);

@@ -1,0 +1,20 @@
+////// plan d'action //////
+
+- construire l'arbre
+- construire la table de symbole globale
+    - nécessite l'arbre
+
+- construire la table des structures
+- construire la table des fonctions 
+
+- vérifier l'usage des identifiants (double déclaration, non déclaration)
+& vérifier les types des expressions lors des affectations
+    - nécessite l'arbre, la table de symbole globale + locale à la fonction
+- vérifier le bon usage des appels de fonction (type)
+
+- éciture dans le fichier 
+
+
+
+
+

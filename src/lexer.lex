@@ -1,11 +1,11 @@
 %{
   /* lexer.l */
   /* Compatible avec parser.y */
-  #define MAXNAME 30
   #include "abstract-tree.h"
   #include "parser.tab.h"
   #include <string.h>
   #include "operator.h"
+  #include "type.h"
   int lineno=1;
   int charno=0;
   int index_text = 0;
@@ -13,6 +13,9 @@
   
   #define MAKE_BIN_OPE {yylval.node = makeNode(BinaryOperator); \
    yylval.node->u.operator = getOperatorFromString(yytext);} 
+
+  #define MAKE_TYPE(X) {yylval.node = makeNode(Type); \
+   yylval.node->u.type = X;}
 
 %}
 
@@ -30,8 +33,8 @@
 "*"|"/"|"%"			{ charno += yyleng; MAKE_BIN_OPE; return DIVSTAR; }
 "<"|"<="|">"|">="		{ charno += yyleng; MAKE_BIN_OPE; return ORDER; }
 ==|!=			{ charno += yyleng;  MAKE_BIN_OPE; return EQ; }
-int			{ charno += yyleng; strcpy(yylval.string, yytext); return SIMPLETYPE;}
-char		{ charno += yyleng; strcpy(yylval.string, yytext); return SIMPLETYPE;}
+int			{ charno += yyleng; MAKE_TYPE(tpc_int); return SIMPLETYPE; }
+char		{ charno += yyleng; MAKE_TYPE(tpc_char); return SIMPLETYPE; }
 print			{ charno += yyleng;return PRINT; }
 readc			{ charno += yyleng;return READC; }
 reade			{ charno += yyleng;return READE; }

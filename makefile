@@ -17,9 +17,9 @@ vpath %.o $(BINPATH)
 
 .PHONY : all
 
-all: addFolders $(EXECPATH)$(EXEC) clean
+all: addFolders $(EXECPATH)$(EXEC) #clean
 
-$(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o
+$(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o type.o struct.o
 	$(CC) -o $@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
 
 parser.tab.c: parser.y
@@ -28,15 +28,19 @@ parser.tab.c: parser.y
 lex.yy.c: lexer.lex
 	flex -o $(SRCPATH)lex.yy.c $<
 
-parser.tab.o: parser.tab.c abstract-tree.h operator.o
+parser.tab.o: parser.tab.c abstract-tree.o operator.o type.o
 
-abstract-tree.o: abstract-tree.c abstract-tree.h operator.o
+abstract-tree.o: abstract-tree.c abstract-tree.h operator.o type.o
 
-symbolTable.o: symbolTable.c symbolTable.h
+symbolTable.o: symbolTable.c symbolTable.h type.o
 
 gen_code_asm.o: gen_code_asm.c gen_code_asm.h
 
 operator.o: operator.c operator.h
+
+type.o : type.c type.h
+
+struct.o : struct.c struct.h abstract-tree.o type.o symbolTable.o
 
 %.o: %.c
 	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS)
