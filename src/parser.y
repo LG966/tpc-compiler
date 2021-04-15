@@ -152,7 +152,14 @@ EnTeteFonct:
     ;
 Parametres:
        VOID         {$$ = makeNode(Void);}
-    |  ListTypVar   {$$ = $1;}
+    |  ListTypVar   {
+                        $$ = $1;
+                        for(Node * ident = FIRSTCHILD($$); ident != NULL; ident = SIBLING(ident))
+                        {
+                            /* printf("ident :%s - type :%s\n", ident->u.identifier, $2->u.type); */
+                            addfuncVar(FIRSTCHILD(ident)->u.identifier, ident->u.type);
+                        }
+                    }
     ;
 ListTypVar:
        ListTypVar ',' Type IDENT    {
@@ -207,18 +214,18 @@ Instr:
                                               addSibling($1, $3);
                                           }
     |  READE '(' LValue ')' ';'           {
-                                              $$ = makeNode(Func);
+                                              $$ = makeNode(Instr);
                                               strcpy($$->u.identifier, $1);
                                               addChild($$, $3);
                                           }
 
     |  READC '(' LValue ')' ';'           {
-                                              $$ = makeNode(Func);
+                                              $$ = makeNode(Instr);
                                               strcpy($$->u.identifier, $1);
                                               addChild($$, $3);
                                           }
     |  PRINT '(' Exp ')' ';'              {
-                                              $$ = makeNode(Func);
+                                              $$ = makeNode(Instr);
                                               strcpy($$->u.identifier, $1);
                                               addChild($$, $3);
                                           }
