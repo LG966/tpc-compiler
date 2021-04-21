@@ -9,12 +9,12 @@ struct elephant{
     char sexe;
 };
 
+struct elephant a1;
 
 int test (int param1, char param2, char param3){
     int a, b, c, d;
-    char m, d, m, a;
+    char m;
 }
-
 
 int main(void)  {
    main_a=12;

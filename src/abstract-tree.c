@@ -96,7 +96,7 @@ void printTree(Node *node) {
     case CharLiteral: printf(": '%c'", node->u.character); break;
     case Identifier: printf(": %s", node->u.identifier); break;
     case StructType: printf(": %s", node->u.identifier); break;
-    case Type : printf(": %s",  getCharFromType(node->u.type)); break;
+    case Type : printf(": %s",  getCharFromNativeType(node->u.type)); break;
     case UnaryOperator : 
     case BinaryOperator : printf(": %s", getStringFromOperator(node->u.operator)); break;
     case Func : printf(": %s", node->u.identifier); break;

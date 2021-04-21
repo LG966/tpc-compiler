@@ -1,6 +1,6 @@
 #include "type.h"
 
-size_t typeSize(Type_tpc t){
+size_t nativeTypeSize(native_t t){
     switch (t)
     {
     case tpc_int:
@@ -10,13 +10,13 @@ size_t typeSize(Type_tpc t){
     case tpc_void:
         return 0; //en théorie...
     default:
-        fprintf(stderr, "Unrecognized type was detected.\n");
+        fprintf(stderr, "Unrecognized native type was detected.\n");
         exit(EXIT_FAILURE);
         return 0;
     }
 }
 
-char * getCharFromType(Type_tpc t){
+char * getCharFromNativeType(native_t t){
     switch (t)
     {
     case tpc_int:
@@ -26,7 +26,7 @@ char * getCharFromType(Type_tpc t){
     case tpc_void:
         return "void";
     default:
-        fprintf(stderr, "Unrecognized type was detected.\n");
+        fprintf(stderr, "Unrecognized struct type was detected.\n");
         exit(EXIT_FAILURE);
         return NULL;
     }

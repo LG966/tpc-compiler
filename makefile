@@ -32,7 +32,7 @@ parser.tab.o: parser.tab.c abstract-tree.o operator.o type.o
 
 abstract-tree.o: abstract-tree.c abstract-tree.h operator.o type.o
 
-symbolTable.o: symbolTable.c symbolTable.h type.o
+symbolTable.o: symbolTable.c symbolTable.h type.o struct.o
 
 gen_code_asm.o: gen_code_asm.c gen_code_asm.h
 
@@ -40,7 +40,7 @@ operator.o: operator.c operator.h
 
 type.o : type.c type.h
 
-struct.o : struct.c struct.h abstract-tree.o type.o symbolTable.o
+struct.o : struct.c struct.h abstract-tree.o type.o
 
 %.o: %.c
 	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS)

@@ -5,12 +5,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include "type.h"
+#include "struct.h"
 
 #define MAXSYMBOLS 256
 
 typedef struct {
     char name[MAXNAME];
-    Type_tpc type;
+    type_kind kind;
+    union {
+        native_t native;
+        unsigned char struc;
+    } type;    
 } STentry;
 
 extern STentry globalST[MAXSYMBOLS];
@@ -21,9 +26,15 @@ extern int funcSTsize;
 void printSTSymbols(STentry * table, int size);
 
 /* returns 1 if redeclaration, 2 if table overflow, 0 if okay */
-int addVarToST(const char name[], Type_tpc type, STentry * table, int * size);
-int addfuncVar(const char name[], Type_tpc type);
-int addglobalVar(const char name[], Type_tpc type);
+int addVarToST_native(const char name[], native_t type, STentry * table, int * size);
+int addVarToST_struct(const char name[], unsigned char struct_type, STentry * table, int * size);
+
+int addfuncVar_native(const char name[], native_t type);
+int addglobalVar_native(const char name[], native_t type);
+
+int addfuncVar_struct(const char name[], unsigned char struct_type);
+int addglobalVar_struct(const char name[], unsigned char struct_type);
+
 void printglobalST();
 void printfuncST();
 void emptyfuncST();

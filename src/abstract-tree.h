@@ -48,7 +48,7 @@ typedef struct Node {
         int integer;
         char character;
         char identifier[64];
-        Type_tpc type;
+        native_t type;
         Operator operator;
     } u;
     struct Node *firstChild, *nextSibling;

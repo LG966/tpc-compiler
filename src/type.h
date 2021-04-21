@@ -6,16 +6,19 @@
 #include <stdio.h>
 
 #define MAXNAME 64
-#define MAX
+
+typedef enum {
+    struc,
+    native
+}type_kind;
 
 typedef enum {
     tpc_int,
     tpc_char,
     tpc_void
-}Type_tpc;
+}native_t;
 
-size_t typeSize(Type_tpc t);
-char * getCharFromType(Type_tpc t);
-
+size_t nativeTypeSize(native_t t);
+char * getCharFromNativeType(native_t t);
 
 #endif

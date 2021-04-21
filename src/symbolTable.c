@@ -11,11 +11,16 @@ void printSTSymbols(STentry * table, int size){
     int i;
     /* printf("%%--- Symbol table ---%%\n"); */
     for(i=0; i!=size; i++){
-        printf("\t%d -- %s of type %s\n", i, table[i].name, getCharFromType(table[i].type));
+        if (table[i].kind == native)
+        {
+            printf("\t%d -- %s of native type %s\n", i, table[i].name, getCharFromNativeType(table[i].type.native));
+        } else {
+            printf("\t%d -- %s of struct type %s\n", i, table[i].name, getStructNameFromIndex(table[i].type.native));
+        }
     }
 }
 
-int addVarToST(const char name[], Type_tpc type, STentry * table, int * size){
+int addVarToST_native(const char name[], native_t type, STentry * table, int * size){
     int count;
     for (count=0;count<*size;count++) {
         if (!strcmp(table[count].name,name)) {
@@ -28,8 +33,31 @@ int addVarToST(const char name[], Type_tpc type, STentry * table, int * size){
         /* printf("too many variables near line %d\n", lineno);
         exit(1); */ return 2;
     }
+    table[*size].kind = native;
     strncpy(table[*size].name, name, MAXNAME - 1);
-    table[*size].type = type;
+    table[*size].type.native = type;
+
+    (*size)++;
+
+    return 0;
+}
+
+int addVarToST_struct(const char name[], unsigned char struct_type, STentry * table, int * size){
+    int count;
+    for (count=0;count<*size;count++) {
+        if (!strcmp(table[count].name,name)) {
+            /* printf("semantic error, redefinition of variable %s near line %d\n",
+            name, lineno); */
+            return 1;
+        }
+    }
+    if (*size+1 > MAXSYMBOLS) {
+        /* printf("too many variables near line %d\n", lineno);
+        exit(1); */ return 2;
+    }
+    table[*size].kind = struc;
+    strncpy(table[*size].name, name, MAXNAME - 1);
+    table[*size].type.struc = struct_type;
 
     (*size)++;
 
@@ -37,13 +65,21 @@ int addVarToST(const char name[], Type_tpc type, STentry * table, int * size){
 }
 
 
-int addfuncVar(const char name[], Type_tpc type){
-    return addVarToST(name, type, funcST, &funcSTsize);
+int addfuncVar_native(const char name[], native_t type){
+    return addVarToST_native(name, type, funcST, &funcSTsize);
+}
+
+int addglobalVar_native(const char name[], native_t type){
+    return addVarToST_native(name, type, globalST, &globalSTsize);
 }
 
 
-int addglobalVar(const char name[], Type_tpc type){
-    return addVarToST(name, type, globalST, &globalSTsize);
+int addfuncVar_struct(const char name[], unsigned char struct_type){
+    return addVarToST_struct(name, struct_type, funcST, &funcSTsize);
+}
+
+int addglobalVar_struct(const char name[], unsigned char struct_type){
+    return addVarToST_struct(name, struct_type, globalST, &globalSTsize);
 }
 
 void printglobalST(){
