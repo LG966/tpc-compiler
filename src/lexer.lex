@@ -10,13 +10,29 @@
   int charno=0;
   int index_text = 0;
   char text_line[100];
-  
+
   #define MAKE_BIN_OPE {yylval.node = makeNode(BinaryOperator); \
-   yylval.node->u.operator = getOperatorFromString(yytext);} 
+   yylval.node->u.operator = getOperatorFromString(yytext);}
 
   #define MAKE_TYPE(X) {yylval.node = makeNode(Type); \
    yylval.node->u.type = X;}
 
+  /* Recopie la ligne lue par l'analyseur dans text_line*/
+  #undef YY_INPUT
+ 	#define YY_INPUT(buf, result, max_size){ \
+ 		char c = fgetc(yyin); \
+ 		result = (c == EOF) ? YY_NULL : (buf[0] = c, 1); \
+ 		/* Vérifie si la ligne a déjà été enregistré */ \
+ 		if(index_text == 0){ \
+ 			while(c != EOF && c != '\n'){ \
+ 				text_line[index_text] = c; \
+ 				index_text++; \
+ 				c = fgetc(yyin); \
+ 			} \
+ 			text_line[index_text] = '\0'; \
+ 			fseek(yyin, -index_text, SEEK_CUR); \
+ 		} \
+ 	}
 %}
 
 

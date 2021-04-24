@@ -60,7 +60,8 @@ clean:
 
 mrproper: clean
 	rm -f $(EXECPATH)$(EXEC)
-	rm -f comp.asm
+	rm -f $(SRCPATH)comp.asm
+	rm -f ./test/resultat.log
 
 tar:
 	cd ..; tar -czf $(CURRENT_DIR).tar.gz $(CURRENT_DIR)

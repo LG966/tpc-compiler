@@ -5,7 +5,7 @@
     char letter, digit, punct;
 	int *p_compteur;
 	int indice, *p_indice;
-    
+
 int main(void)  {
    somme=12;
    produit=24;

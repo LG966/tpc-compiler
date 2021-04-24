@@ -1,0 +1,22 @@
+
+struct Point{
+		int x;
+		int y;
+};
+
+struct Point newPoint(int x, int y){
+        struct Point p;
+        pX = x;
+        pY = y;
+        return p;
+}
+
+int main(void){
+        struct Point p;
+
+        p = newPoint(5, 6); //Nouvea Point
+        print(p.pX);
+        print(p.pY);
+
+      return 0;
+}
