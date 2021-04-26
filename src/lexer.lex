@@ -62,7 +62,7 @@ while			{ charno += yyleng;return WHILE; }
 return			{ charno += yyleng;return RETURN; }
 [a-zA-Z_][a-zA-Z0-9_]*	{ charno += yyleng; strcpy(yylval.string, yytext); return IDENT; }
 [0-9]+			{ charno += yyleng; sscanf(yytext, "%d", &(yylval.num)); return NUM;}
-'\\?.'			{ charno += yyleng; return CHARACTER; }
+'\\?.'			{ charno += yyleng; yylval.character = yytext[1]; return CHARACTER; }
 .			{ charno += yyleng; return yytext[0];}
 <LONG_COMMENT>"*/"		{ BEGIN INITIAL; charno += yyleng; }
 <LONG_COMMENT,SHORT_COMMENT>.		{charno += yyleng;}

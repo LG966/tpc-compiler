@@ -17,10 +17,12 @@ rm -f $results #Suppression anciens résultats
 countGood=0
 countSyn=0
 countSem=0
-echo "====Début des tests positifs===="
+echo "==== Début des tests positifs ===="
 for i in $(ls $good_rep)
 do
+	tput setaf 5 
 	echo "./bin/$exec < $i"
+	tput sgr0
   	./bin/$exec < $good_rep/$i
 	# renvoie le résultat dans le fichier 'resultat' sous la
 	# forme 'nom de fichier' 'résultat de l'analyse du fichier (0 ou 1)'
@@ -33,11 +35,13 @@ done
 
 #Tests des négatifs
 echo -e "\n\n"
-echo "====Début des tests d'erreurs lexicales / syntaxiques===="
+echo "==== Début des tests avec erreur lexicale / syntaxique ===="
 for i in $(ls $syn_rep)
 do
+	tput setaf 5 
 	echo "./bin/$exec < $i"
-    	./bin/$exec < $syn_rep/$i
+	tput sgr0
+    ./bin/$exec < $syn_rep/$i
 	# renvoie le résultat dans le fichier 'resultat' sous la
 	# forme 'nom de fichier' 'résultat de l'analyse du fichier (0 ou 1)'
 	ret=$?
@@ -48,11 +52,13 @@ do
 done
 
 echo -e "\n\n"
-echo "====Début des tests d'erreurs lexicales / syntaxiques===="
+echo "==== Début des tests avec erreur sémentique ===="
 for i in $(ls $sem_rep)
 do
+	tput setaf 5 
 	echo "./bin/$exec < $i"
-    	./bin/$exec < $sem_rep/$i
+	tput sgr0
+    ./bin/$exec < $sem_rep/$i
 	# renvoie le résultat dans le fichier 'resultat' sous la
 	# forme 'nom de fichier' 'résultat de l'analyse du fichier (0 ou 1)'
 	ret=$?
@@ -62,15 +68,35 @@ do
 	fi
 done
 
-
 echo -e "\n\n"
 
-echo "Les Résultats des tests sont disponible dans le fichier $results"
+echo "Les Résultats des tests sont disponibles dans le fichier $results"
+
 nb=$(ls $good_rep | wc -l)
+if [ $nb = $countGood ]
+then
+	tput setaf 2
+else
+	tput setaf 1
+fi
 echo "$countGood / $nb tests positifs sont un succés"
+
 nb=$(ls $syn_rep | wc -l)
-echo "$countSyn / $nb tests erreurs lexicales / syntaxiques sont un succés"
+if [ $nb = $countSyn ] 
+then
+	tput setaf 2
+else
+	tput setaf 1
+fi
+echo "$countSyn / $nb tests avec erreurs lexicales / syntaxiques sont un succés"
+
 nb=$(ls $sem_rep | wc -l)
+if [ $nb = $countSem ] 
+then
+	tput setaf 2
+else
+	tput setaf 1
+fi
 echo "$countSem / $nb tests erreurs sémantiques sont un succés"
 
 echo -e "\n\n"

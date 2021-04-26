@@ -15,7 +15,7 @@ vpath %.y $(SRCPATH)
 vpath %.lex $(SRCPATH)
 vpath %.o $(BINPATH)
 
-.PHONY : all
+.PHONY : all clean mrproper tar
 
 all: addFolders $(EXECPATH)$(EXEC) #clean
 

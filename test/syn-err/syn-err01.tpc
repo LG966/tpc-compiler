@@ -3,7 +3,7 @@ struct Point newPoint{};
 int main(void){
         struct Point p;
 
-        p = newPoint(5, 6); //Nouvea Point
+        p = newPoint(5, 6); //Nouveau Point
         print(pX);
         print(pY);
 

@@ -38,8 +38,10 @@ typedef enum {
   IfElse,
   While,
   BoolOperator,
-  Return
-
+  Return,
+  Reade,
+  Readc,
+  Print
 } Kind;
 
 typedef struct Node {
