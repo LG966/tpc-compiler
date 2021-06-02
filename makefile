@@ -34,7 +34,7 @@ abstract-tree.o: abstract-tree.c abstract-tree.h operator.o type.o
 
 symbolTable.o: symbolTable.c symbolTable.h type.o struct.o
 
-gen_code_asm.o: gen_code_asm.c gen_code_asm.h
+gen_code_asm.o: gen_code_asm.c gen_code_asm.h operator.h symbolTable.h
 
 operator.o: operator.c operator.h
 
@@ -60,7 +60,7 @@ clean:
 
 mrproper: clean
 	rm -f $(EXECPATH)$(EXEC)
-	rm -f $(SRCPATH)comp.asm
+	rm -f comp.asm
 	rm -f ./test/resultat.log
 
 tar:

@@ -5,7 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "symbolTable.h"
+#include "operator.h"
 
-int begin_data_asm(STentry *symbolTable);
+void begin_data_asm(FILE *file, STentry *symbolTable);
+void begin_texte_asm(FILE *file);
+void write_expresion(FILE *file, Node *node);
+void gen_code_by_tree(FILE *file, STentry *symbolTable, Node *node);
 
 #endif

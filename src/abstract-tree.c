@@ -2,7 +2,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "operator.h"
 #include "abstract-tree.h"
+
 
 static const char *StringFromKind[] = {
   "Program",
@@ -30,7 +32,7 @@ static const char *StringFromKind[] = {
   "Assignement",
   "Func",
   "Arguments",
-  "StructAccess", 
+  "StructAccess",
   "LoneIf",
   "IfElse",
   "While",
@@ -97,7 +99,7 @@ void printTree(Node *node) {
     case Identifier: printf(": %s", node->u.identifier); break;
     case StructType: printf(": %s", node->u.identifier); break;
     case Type : printf(": %s",  getCharFromNativeType(node->u.type)); break;
-    case UnaryOperator : 
+    case UnaryOperator : printf(": %s", getStringFromOperator(node->u.operator)); break;
     case BinaryOperator : printf(": %s", getStringFromOperator(node->u.operator)); break;
     case Func : printf(": %s", node->u.identifier); break;
     default: break;
