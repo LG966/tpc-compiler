@@ -8,6 +8,7 @@
   #include "type.h"
   #include "struct.h"
   #include "gen_code_asm.h"
+  #include "func.h"
 
 
   #define STRUCT_TYPE(X) ({int __val = getStructIndex(X); \
@@ -58,9 +59,10 @@ Prog:  TypesVars DeclFoncts     {
                                     $$ = makeNode(Program);
                                     addChild($$, $1);
                                     addChild($$, $2);
-                                    printglobalST();
+                                    /* printglobalST();
                                     printStructs();
-                                    printTree($$);
+                                    printTree($$); */
+                                    printPrototypes();
                                 }
     ;
 TypesVars:
@@ -156,9 +158,20 @@ DeclFonct:
                                     $$ = makeNode(DeclFonct);
                                     addChild($$, $1);
                                     addChild($$, $2);
+
+                                    // Table des symboles locales
                                     printf("\nfun %s -> ", SECONDCHILD($1)->u.identifier);
                                     printfuncST();
                                     emptyfuncST();
+
+                                    //Ajout dans la table des prototypes
+                                    switch(addFuncPrototype($$))
+                                    {
+                                        case 1: fprintf(stderr, "%d:%d: error: redeclaration of function '%s'\n", lineno, charno, SIBLING(FIRSTCHILD($1))->u.identifier); exit(SEMANTIC_ERROR);
+                                        case 2: fprintf(stderr, "%d:%d: error: too many functions declared (LIMIT : %d)\n", lineno, charno, MAXFUNC); exit(DEFAULT_ERROR);
+                                        case 3: fprintf(stderr, "%d:%d: error: too many parameters in function '%s' (LIMIT : %d)\n", lineno, charno, SIBLING(FIRSTCHILD($1))->u.identifier, MAXPARAMATERS); exit(DEFAULT_ERROR);
+                                        default: break;
+                                    }
                                 }
     ;
 EnTeteFonct:
@@ -450,6 +463,9 @@ ListExp:
 %%
 
 int main(int argc, char** argv) {
+    /* #ifdef YYDEBUG
+    yydebug = 1;
+    #endif */
     int rtr;
     rtr = yyparse();
     //begin_data_asm(globalST);

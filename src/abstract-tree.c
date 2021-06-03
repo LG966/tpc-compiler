@@ -5,7 +5,6 @@
 #include "operator.h"
 #include "abstract-tree.h"
 
-
 static const char *StringFromKind[] = {
   "Program",
   "VarDeclList",
@@ -32,7 +31,7 @@ static const char *StringFromKind[] = {
   "Assignement",
   "Func",
   "Arguments",
-  "StructAccess",
+  "StructAccess", 
   "LoneIf",
   "IfElse",
   "While",
@@ -99,18 +98,13 @@ void printTree(Node *node) {
     case Identifier: printf(": %s", node->u.identifier); break;
     case StructType: printf(": %s", node->u.identifier); break;
     case Type : printf(": %s",  getCharFromNativeType(node->u.type)); break;
-    case UnaryOperator : printf(": %s", getStringFromOperator(node->u.operator)); break;
+    case UnaryOperator : 
     case BinaryOperator : printf(": %s", getStringFromOperator(node->u.operator)); break;
     case Func : printf(": %s", node->u.identifier); break;
     default: break;
   }
   printf("\n");
   depth++;
-
-  /* fprintf(stderr, "@ %s \n", StringFromKind[node->kind]);
-  for(Node *child = node->firstChild; child != NULL; child = child->nextSibling);
-  fprintf(stderr, "Done\n"); */
-
 
   for ( Node *child = node->firstChild; child != NULL; child = child->nextSibling) {
     rightmost[depth] = (child->nextSibling) ? false : true;
