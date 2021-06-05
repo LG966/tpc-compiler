@@ -10,11 +10,13 @@
   #include "gen_code_asm.h"
   #include "func.h"
 
+  #define ERR_HEADER(NODE) (printf("%s:%d:%d:error: ", __BASE_FILE__, NODE->lineno, NODE->charno))
 
-  #define STRUCT_TYPE(X) ({int __val = getStructIndex(X); \
-                            (__val == -1 ? ({fprintf(stderr, "%d:%d: error: unrecognized struct type '%s'\n", lineno, charno, X); \
+  #define STRUCT_TYPE(NODE) ({int __val = getStructIndex(NODE->u.identifier); \
+                            (__val == -1 ? ({ERR_HEADER(NODE); printf("unrecognized struct type '%s'\n", NODE->u.identifier); \
                             exit(EXIT_FAILURE); -1;}) : __val); })
   
+
   #define SEMANTIC_ERROR 2
   #define DEFAULT_ERROR 3
 
@@ -60,8 +62,8 @@ Prog:  TypesVars DeclFoncts     {
                                     addChild($$, $1);
                                     addChild($$, $2);
                                     /* printglobalST();
-                                    printStructs();
-                                    printTree($$); */
+                                    printStructs();*/
+                                    printTree($$); 
                                     printPrototypes();
                                 }
     ;
@@ -76,16 +78,16 @@ TypesVars:
                                                     if($2->kind == Type)
                                                     {
                                                         switch(addglobalVar_native(ident->u.identifier, $2->u.type)){
-                                                            case 1: fprintf(stderr, "%d:%d: error: redifinition of variable '%s'\n", lineno, charno, ident->u.identifier); exit(SEMANTIC_ERROR);
-                                                            case 2: fprintf(stderr, "%d:%d: error: too many global variables defined (LIMIT : %d)\n", lineno, charno, MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                                            case 1: ERR_HEADER(ident); printf("redifinition of variable '%s'\n", ident->u.identifier); exit(SEMANTIC_ERROR);
+                                                            case 2: ERR_HEADER(ident); printf("too many global variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
                                                             default: break;
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        switch(addglobalVar_struct(ident->u.identifier, STRUCT_TYPE($2->u.identifier))){
-                                                            case 1: fprintf(stderr, "%d:%d: error: redifinition of variable '%s'\n", lineno, charno, ident->u.identifier); exit(SEMANTIC_ERROR);
-                                                            case 2: fprintf(stderr, "%d:%d: error: too many global variables defined (LIMIT : %d)\n", lineno, charno, MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                                        switch(addglobalVar_struct(ident->u.identifier, STRUCT_TYPE($2))){
+                                                            case 1: ERR_HEADER(ident); printf("%d:%d: error: redifinition of variable '%s'\n", lineno, charno, ident->u.identifier); exit(SEMANTIC_ERROR);
+                                                            case 2: ERR_HEADER(ident); printf("%d:%d: error: too many global variables defined (LIMIT : %d)\n", lineno, charno, MAXSYMBOLS); exit(DEFAULT_ERROR);
                                                             default: break;
                                                         } 
                                                     }
@@ -104,9 +106,9 @@ TypesVars:
                                                             addChild(declstruct, $5);
 
                                                             switch(addStructDecl(declstruct)){
-                                                                case 1: fprintf(stderr, "%d:%d: error: redifinition of struct '%s'\n", lineno, charno, $3); exit(SEMANTIC_ERROR);
-                                                                case 2: fprintf(stderr, "%d:%d: error: too many struct types defined (LIMIT : %d)\n", lineno, charno, MAXSTRUCTS); exit(DEFAULT_ERROR);
-                                                                case 3: fprintf(stderr, "%d:%d: error: redifinition of a member in struct '%s'\n", lineno, charno, $3); exit(SEMANTIC_ERROR);
+                                                                case 1: ERR_HEADER($5); printf("redifinition of struct '%s'\n", $3); exit(SEMANTIC_ERROR);
+                                                                case 2: ERR_HEADER($5); printf("too many struct types defined (LIMIT : %d)\n", MAXSTRUCTS); exit(DEFAULT_ERROR);
+                                                                case 3: ERR_HEADER($5); printf("redifinition of a member in struct '%s'\n", $3); exit(SEMANTIC_ERROR);
                                                                 default: break;
                                                             }
                             
@@ -167,9 +169,9 @@ DeclFonct:
                                     //Ajout dans la table des prototypes
                                     switch(addFuncPrototype($$))
                                     {
-                                        case 1: fprintf(stderr, "%d:%d: error: redeclaration of function '%s'\n", lineno, charno, SIBLING(FIRSTCHILD($1))->u.identifier); exit(SEMANTIC_ERROR);
-                                        case 2: fprintf(stderr, "%d:%d: error: too many functions declared (LIMIT : %d)\n", lineno, charno, MAXFUNC); exit(DEFAULT_ERROR);
-                                        case 3: fprintf(stderr, "%d:%d: error: too many parameters in function '%s' (LIMIT : %d)\n", lineno, charno, SIBLING(FIRSTCHILD($1))->u.identifier, MAXPARAMATERS); exit(DEFAULT_ERROR);
+                                        case 1: ERR_HEADER(SIBLING(FIRSTCHILD($1))); printf("redeclaration of function '%s'\n",SIBLING(FIRSTCHILD($1))->u.identifier); exit(SEMANTIC_ERROR);
+                                        case 2: ERR_HEADER(SIBLING(FIRSTCHILD($1))); printf("too many functions declared (LIMIT : %d)\n", MAXFUNC); exit(DEFAULT_ERROR);
+                                        case 3: ERR_HEADER(SIBLING(FIRSTCHILD($1))); printf("too many parameters in function '%s' (LIMIT : %d)\n", SIBLING(FIRSTCHILD($1))->u.identifier, MAXPARAMATERS); exit(DEFAULT_ERROR);
                                         default: break;
                                     }
                                 }
@@ -201,17 +203,17 @@ Parametres:
                             if(ident->kind == Type)
                             {
                                 switch(addfuncVar_native(FIRSTCHILD(ident)->u.identifier, ident->u.type)){
-                                    case 1: fprintf(stderr, "%d:%d: error: redifinition of variable '%s'\n", lineno, charno, FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
-                                    case 2: fprintf(stderr, "%d:%d: error: too many local variables defined (LIMIT : %d)\n", lineno, charno, MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                    case 1: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("redifinition of variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
+                                    case 2: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
                                     default: break;
                                 }
                             }
                             else
                             {
-                                switch(addfuncVar_struct(FIRSTCHILD(ident)->u.identifier, STRUCT_TYPE(ident->u.identifier))){
-                                    case 1: fprintf(stderr, "%d:%d: error: redifinition of variable '%s'\n", lineno, charno, FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
-                                    case 2: fprintf(stderr, "%d:%d: error: too many local variables defined (LIMIT : %d)\n", lineno, charno, MAXSYMBOLS); exit(DEFAULT_ERROR);
-                                    default: break;
+                                switch(addfuncVar_struct(FIRSTCHILD(ident)->u.identifier, STRUCT_TYPE(ident))){
+                                    case 1: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("redifinition of variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
+                                    case 2: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                    default: break; 
                                 }
                             }
                             
@@ -252,16 +254,16 @@ DeclVars:
                                                 if($2->kind == Type)
                                                 {
                                                     switch(addfuncVar_native(ident->u.identifier, $2->u.type)){
-                                                        case 1: fprintf(stderr, "%d:%d: error: redifinition of variable '%s'\n", lineno, charno, ident->u.identifier); exit(SEMANTIC_ERROR);
-                                                        case 2: fprintf(stderr, "%d:%d: error: too many local variables defined (LIMIT : %d)\n", lineno, charno, MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                                        case 1: ERR_HEADER(ident); printf("redifinition of variable '%s'\n", ident->u.identifier); exit(SEMANTIC_ERROR);
+                                                        case 2: ERR_HEADER(ident); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
                                                         default: break;
                                                     }    
                                                 }
                                                 else
                                                 {
-                                                    switch(addfuncVar_struct(ident->u.identifier, STRUCT_TYPE($2->u.identifier))){
-                                                        case 1: fprintf(stderr, "%d:%d: error: redifinition of variable '%s'\n", lineno, charno, ident->u.identifier); exit(SEMANTIC_ERROR);
-                                                        case 2: fprintf(stderr, "%d:%d: error: too many local variables defined (LIMIT : %d)\n", lineno, charno, MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                                    switch(addfuncVar_struct(ident->u.identifier, STRUCT_TYPE($2))){
+                                                        case 1: ERR_HEADER(ident); printf("redifinition of variable '%s'\n", ident->u.identifier); exit(SEMANTIC_ERROR);
+                                                        case 2: ERR_HEADER(ident); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
                                                         default: break;
                                                     } 
                                                 }

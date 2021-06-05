@@ -6,6 +6,8 @@
 #include "type.h"
 
 extern int lineno;
+extern int charno;
+
 
 typedef enum {
   Program,
@@ -55,6 +57,7 @@ typedef struct Node {
     } u;
     struct Node *firstChild, *nextSibling;
     int lineno;
+    int charno;
 } Node;
 
 Node *makeNode(Kind kind);

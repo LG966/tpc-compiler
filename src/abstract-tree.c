@@ -52,6 +52,7 @@ Node *makeNode(Kind kind) {
   node->kind = kind;
   node-> firstChild = (node->nextSibling = NULL);
   node->lineno=lineno;
+  node->charno=charno;
   return node;
 }
 
