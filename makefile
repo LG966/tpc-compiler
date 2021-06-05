@@ -22,6 +22,8 @@ all: addFolders $(EXECPATH)$(EXEC) #clean
 $(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o type.o struct.o func.o
 	$(CC) -o $@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
 
+
+
 parser.tab.c: parser.y
 	bison --defines=$(SRCPATH)parser.tab.h -o $(SRCPATH)parser.tab.c $<
 
@@ -34,7 +36,7 @@ abstract-tree.o: abstract-tree.c abstract-tree.h operator.o type.o
 
 symbolTable.o: symbolTable.c symbolTable.h type.o struct.o
 
-gen_code_asm.o: gen_code_asm.c gen_code_asm.h operator.h symbolTable.h
+gen_code_asm.o: gen_code_asm.c gen_code_asm.h operator.h symbolTable.h func.h
 
 operator.o: operator.c operator.h
 
@@ -42,12 +44,16 @@ type.o : type.c type.h
 
 struct.o : struct.c struct.h abstract-tree.o type.o
 
-func.o : func.c func.h type.o struct.o abstract-tree.o 
+func.o : func.c func.h type.o struct.o abstract-tree.o
 
 %.o: %.c
 	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS)
 
 addFolders: | $(EXECPATH) $(BINPATH)
+
+trad:
+	nasm -f elf64 -o $(BINPATH)comp.o $(SRCPATH)comp.asm
+	$(CC) $(BINPATH)comp.o -nostartfiles -no-pie
 
 $(EXECPATH):
 	mkdir $(EXECPATH)
@@ -62,8 +68,9 @@ clean:
 
 mrproper: clean
 	rm -f $(EXECPATH)$(EXEC)
-	rm -f comp.asm
+	rm -f $(SRCPATH)comp.asm
 	rm -f ./test/resultat.log
+	rm -f a.out
 
 tar:
 	cd ..; tar -czf $(CURRENT_DIR).tar.gz $(CURRENT_DIR)

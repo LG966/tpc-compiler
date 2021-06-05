@@ -10,11 +10,11 @@
 
 typedef struct func{
     //function name
-    char * name;
+    char *name;
 
     //return type
     type_kind return_type_kind;
-    union 
+    union
     {
         native_t native;
         unsigned char struc;
@@ -28,7 +28,7 @@ typedef struct func{
     struct
     {
         type_kind parameter_type_kind;
-        union 
+        union
         {
             native_t native;
             unsigned char struc;
@@ -39,9 +39,11 @@ typedef struct func{
 
 
 //extern fun_prototype prototypes[MAXFUNC];
-
+fun_prototype prototypes[MAXFUNC];
 
 int addFuncPrototype(Node * node);
+
+int getIndexFromFunName(char *name);
 
 void printPrototypes();
 

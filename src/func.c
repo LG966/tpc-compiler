@@ -1,8 +1,6 @@
 #include "func.h"
 
-fun_prototype prototypes[MAXFUNC];
 int prototypesSize = 0;
-
 
 static const char * getCharFromAnyType(type_kind kind, native_t n, unsigned char s){
     if (kind == native)
@@ -34,7 +32,7 @@ int addFuncPrototype(Node * node){
             return 1;
         }
     }
-    
+
     //Too many prototypes
     if (prototypesSize >= MAXFUNC)
     {
@@ -55,7 +53,7 @@ int addFuncPrototype(Node * node){
             prototypes[prototypesSize].return_type.native = FIRSTCHILD(FIRSTCHILD(node))->u.type;
         }
     }
-    
+
     //Function name
     prototypes[prototypesSize].name = SIBLING(FIRSTCHILD(FIRSTCHILD(node)))->u.identifier;
 
@@ -78,12 +76,21 @@ int addFuncPrototype(Node * node){
             }else{
                 prototypes[prototypesSize].parameters[params].parameter_type_kind = native;
                 prototypes[prototypesSize].parameters[params].parameter_type.native = parameter->u.type;
-            }   
+            }
         }
     }
     prototypes[prototypesSize].param_len = params;
     prototypesSize++;
     return 0;
+}
+
+int getIndexFromFunName(char *name){
+    int i = 0;
+    for(i = 0; i < prototypesSize; i++){
+        if(strcmp(name, prototypes[i].name) == 0)
+            return i;
+    }
+    return -1; /*Func doesn't exist*/
 }
 
 void printPrototypes(){
@@ -108,6 +115,6 @@ void printPrototypes(){
                 printf(", %s", getCharFromAnyType(prototypes[i].parameters[j].parameter_type_kind, prototypes[i].parameters[j].parameter_type.native, prototypes[i].parameters[j].parameter_type.struc));
             }
             printf(");\n");
-        }   
+        }
     }
 }

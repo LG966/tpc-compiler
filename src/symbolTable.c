@@ -6,6 +6,38 @@ STentry funcST[MAXSYMBOLS];
 int globalSTsize=0;
 int funcSTsize=0;
 
+void create_STFun_with_tree(Node *node){
+  if(node == NULL){
+    return;
+  }
+  for ( Node *child = node->firstChild; child != NULL; child = child->nextSibling) {
+      create_STFun_with_tree(child);
+  }
+  switch(node->kind){
+      case Type:
+          if(node->firstChild->kind != Declarateurs)
+              for(Node *child = node->firstChild; child != NULL;child = child->nextSibling){
+                      addfuncVar_native(child->u.identifier, node->u.type);
+              }
+          else{
+            for(Node *child = node->firstChild->firstChild; child != NULL;child = child->nextSibling){
+                    addfuncVar_native(child->u.identifier, node->u.type);
+            }
+          }
+          break;
+      default: break;
+  }
+}
+
+int findGlobalSymbol(const char name[MAXNAME]){
+    int i = 0;
+    for (i = 0; i < globalSTsize; i++){
+        if(strcmp(globalST[i].name, name) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}
 
 void printSTSymbols(STentry * table, int size){
     int i;
@@ -66,6 +98,8 @@ int addVarToST_struct(const char name[], unsigned char struct_type, STentry * ta
 
 
 int addfuncVar_native(const char name[], native_t type){
+    if(findGlobalSymbol(name) == 1)
+        return 3; /*Variable déjà définie en global*/
     return addVarToST_native(name, type, funcST, &funcSTsize);
 }
 
@@ -90,6 +124,15 @@ void printglobalST(){
 void printfuncST(){
     printf("******* LOCALS ********\n");
     printSTSymbols(funcST, funcSTsize);
+}
+
+int getSymbolIndexFromVarName(char *name){
+    int i = 0;
+    for(i = 0; i < funcSTsize; i++){
+        if(strcmp(name, funcST[i].name) == 0)
+            return i;
+    }
+    return -1; /*variable not in funcST*/
 }
 
 void emptyfuncST(){

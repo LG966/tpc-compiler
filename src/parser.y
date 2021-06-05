@@ -15,7 +15,7 @@
   #define STRUCT_TYPE(NODE) ({int __val = getStructIndex(NODE->u.identifier); \
                             (__val == -1 ? ({ERR_HEADER(NODE); printf("unrecognized struct type '%s'\n", NODE->u.identifier); \
                             exit(EXIT_FAILURE); -1;}) : __val); })
-  
+
 
   #define SEMANTIC_ERROR 2
   #define DEFAULT_ERROR 3
@@ -28,6 +28,7 @@
   int yylex();
   void yyerror(const char *);
   Node * makeIdentifier(char * ident_name);
+  Node *racine;
 %}
 
 
@@ -63,7 +64,8 @@ Prog:  TypesVars DeclFoncts     {
                                     addChild($$, $2);
                                     /* printglobalST();
                                     printStructs();*/
-                                    printTree($$); 
+                                    racine = $$;
+                                    printTree(racine);
                                     printPrototypes();
                                 }
     ;
@@ -89,7 +91,7 @@ TypesVars:
                                                             case 1: ERR_HEADER(ident); printf("%d:%d: error: redifinition of variable '%s'\n", lineno, charno, ident->u.identifier); exit(SEMANTIC_ERROR);
                                                             case 2: ERR_HEADER(ident); printf("%d:%d: error: too many global variables defined (LIMIT : %d)\n", lineno, charno, MAXSYMBOLS); exit(DEFAULT_ERROR);
                                                             default: break;
-                                                        } 
+                                                        }
                                                     }
                                                 }
                                             }
@@ -111,12 +113,12 @@ TypesVars:
                                                                 case 3: ERR_HEADER($5); printf("redifinition of a member in struct '%s'\n", $3); exit(SEMANTIC_ERROR);
                                                                 default: break;
                                                             }
-                            
+
                                                         }
     |  %empty                                           {$$ = makeNode(TypesVars);}
     ;
 Type:
-       SIMPLETYPE       
+       SIMPLETYPE
     |  STRUCT IDENT     {$$ = makeNode(StructType); strcpy($$->u.identifier, $2);}
     ;
 Declarateurs:
@@ -205,6 +207,7 @@ Parametres:
                                 switch(addfuncVar_native(FIRSTCHILD(ident)->u.identifier, ident->u.type)){
                                     case 1: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("redifinition of variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
                                     case 2: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                    case 3: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("redifinition of global variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
                                     default: break;
                                 }
                             }
@@ -213,10 +216,10 @@ Parametres:
                                 switch(addfuncVar_struct(FIRSTCHILD(ident)->u.identifier, STRUCT_TYPE(ident))){
                                     case 1: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("redifinition of variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
                                     case 2: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
-                                    default: break; 
+                                    default: break;
                                 }
                             }
-                            
+
                         }
                     }
     ;
@@ -246,7 +249,7 @@ DeclVars:
                                             addChild($$, $2);
                                             addChild($2, $3);
 
-                                            
+
 
                                             for(Node * ident = FIRSTCHILD($3); ident != NULL; ident = SIBLING(ident))
                                             {
@@ -256,8 +259,9 @@ DeclVars:
                                                     switch(addfuncVar_native(ident->u.identifier, $2->u.type)){
                                                         case 1: ERR_HEADER(ident); printf("redifinition of variable '%s'\n", ident->u.identifier); exit(SEMANTIC_ERROR);
                                                         case 2: ERR_HEADER(ident); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                                        case 3: ERR_HEADER(ident); printf("redifinition of global variable '%s'\n", ident->u.identifier); exit(SEMANTIC_ERROR);
                                                         default: break;
-                                                    }    
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -265,9 +269,9 @@ DeclVars:
                                                         case 1: ERR_HEADER(ident); printf("redifinition of variable '%s'\n", ident->u.identifier); exit(SEMANTIC_ERROR);
                                                         case 2: ERR_HEADER(ident); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
                                                         default: break;
-                                                    } 
+                                                    }
                                                 }
-                                                
+
                                             }
                                         }
     |  %empty                           {
@@ -469,9 +473,19 @@ int main(int argc, char** argv) {
     yydebug = 1;
     #endif */
     int rtr;
+    FILE *file;
     rtr = yyparse();
-    //begin_data_asm(globalST);
-	return rtr;
+    if(NULL == (file = fopen("./src/comp.asm", "w")))
+        return -1;
+
+    /*Regrouper dans une fonction qui lance tout ?*/
+    begin_data_asm(file, globalST);
+    begin_texte_asm(file);
+    emptyfuncST();
+    gen_code_by_tree(file, globalST, racine);
+    /**/
+    fclose(file);
+	  return rtr;
 }
 
 void display_error(){

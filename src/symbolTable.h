@@ -15,7 +15,7 @@ typedef struct {
     union {
         native_t native;
         unsigned char struc;
-    } type;    
+    } type;
 } STentry;
 
 extern STentry globalST[MAXSYMBOLS];
@@ -39,5 +39,8 @@ void printglobalST();
 void printfuncST();
 void emptyfuncST();
 
+void create_STFun_with_tree(Node *node);
+int findGlobalSymbol(const char name[MAXNAME]);
+int getSymbolIndexFromVarName(char *name);
 
 #endif
