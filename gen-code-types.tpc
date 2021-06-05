@@ -5,10 +5,16 @@
     char letter, digit, punct;
 	int p_compteur;
 	int indice, p_indice;
+  int b;
+
+int integer(int c, char r){
+    return 45;
+}
 
 int main(int argc, char argv) {
-    int a, b, c;
+    int a, c;
     char k, v, p;
-    a = (24 / 12) * 5 + 3 - 2;
-    return (5 + 3) * 2;
+    b = 23;
+    a = (24 - b) * 5 + 3 - 2;
+    return a;
 }

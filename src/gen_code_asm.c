@@ -13,7 +13,7 @@ StackPlace FuncPlace[MAXSYMBOLS];
 int SizeFuncPlace = 0;
 
 void begin_texte_asm(FILE *file){
-    fprintf(file, "section .text\nglobal _start\n_start:\n");
+    fprintf(file, "section .text\nglobal _start\n\n");
     /*puis appel fonction traduction*/
 }
 
@@ -26,6 +26,28 @@ void begin_data_asm(FILE *file, STentry *symbolTable){
         /*faire le cas de type structure ?*/
     }
     fprintf(file, "\n");
+}
+
+void call_func(FILE *file, Node *node, int i){
+    if(node == NULL){
+      return;
+    }
+    for ( Node *child = node->firstChild; child != NULL; child = child->nextSibling) {
+        call_func(file, child, i);
+        i = i + 1;
+    }
+    switch(node->kind){
+      case IntLiteral:
+          if(i < 6) /*mov in register if less than 6 parameters*/
+              fprintf(file, "\tmov %s, %d\n", ParametersRegister[i], node->u.integer);
+          break;
+      case CharLiteral:
+          if(i < 6) /*mov in register if less than 6 parameters*/
+              fprintf(file, "\tmov %s, '%c'\n", ParametersRegister[i], node->u.character);
+          /*Faire hors registre + si ident*/
+          break;
+      default: break;
+    }
 }
 
 void write_expresion(FILE *file, Node *node ){
@@ -50,6 +72,7 @@ void write_expresion(FILE *file, Node *node ){
         }
         fprintf(file, "\tpush rbx\n");
         break;
+    case Func : /*faire nouveau bloc*/call_func(file, FIRSTCHILD(node), 0); break;
     case Identifier:
         index_ident = getPlaceFromName(node->u.identifier);
         if(findGlobalSymbol(node->u.identifier))
@@ -71,7 +94,6 @@ void gen_code_by_tree(FILE *file, STentry *symbolTable, Node *node){
   for ( Node *child = node->firstChild; child != NULL; child = child->nextSibling) {
     gen_code_by_tree(file, symbolTable, child);
   }
-
   switch(node->kind){
     case Assignement:
         write_expresion(file, node);
@@ -85,12 +107,19 @@ void gen_code_by_tree(FILE *file, STentry *symbolTable, Node *node){
         break;
     case ListTypVar: empty_FunPlace(); emptyfuncST(); create_STFun_with_tree(node); break;
     case DeclVars: create_STFun_with_tree(node); create_FuncPlace_with_FuncST(); printFuncPlace(); printfuncST(); break;
-    case EnTeteFonct: index_func = getIndexFromFunName(SECONDCHILD(node)->u.identifier); break;
+    case EnTeteFonct:
+        index_func = getIndexFromFunName(SECONDCHILD(node)->u.identifier);
+          if(strcmp(prototypes[index_func].name, "main") == 0)
+              fprintf(file, "_start:\n");
+          else
+              fprintf(file, "%s:\n", prototypes[index_func].name);
+          break;
     case Return:
         write_expresion(file, node);
-        if(strcmp(prototypes[index_func].name, "main") == 0){
+        if(strcmp(prototypes[index_func].name, "main") == 0)
             fprintf(file, "\tpop rdi\n\tmov rax, 60\n\tsyscall");
-        }
+        else
+            fprintf(file, "\tpop rax\n\tret\n\n");
     break;
     default: break;
   }
