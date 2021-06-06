@@ -41,6 +41,7 @@ void emptyfuncST();
 
 void create_STFun_with_tree(Node *node);
 int findGlobalSymbol(const char name[MAXNAME]);
-int getSymbolIndexFromVarName(char *name);
+int getSymbolIndexFromVarNameLocal(char *name);
+int getSymbolIndexFromVarNameGlobal(char *name);
 
 #endif

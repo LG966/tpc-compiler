@@ -50,7 +50,7 @@ void call_func(FILE *file, Node *node, int i){
     }
 }
 
-void write_expresion(FILE *file, Node *node ){
+void write_expresion(FILE *file, Node *node){
   int index_ident = 0;
   if(node == NULL){
     return;
@@ -134,7 +134,7 @@ void create_FuncPlace_with_FuncST(){
 
 void addFuncPlace(char *name){
     /*name is a parameter*/
-    int indexOfNameInST = getSymbolIndexFromVarName(name);
+    int indexOfNameInST = getSymbolIndexFromVarNameLocal(name);
     strcpy(FuncPlace[SizeFuncPlace].name, name);
     FuncPlace[SizeFuncPlace].stack = 1;
     if(prototypes[index_func].param_len < 6)

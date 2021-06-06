@@ -38,8 +38,8 @@ typedef struct func{
 }fun_prototype;
 
 
-//extern fun_prototype prototypes[MAXFUNC];
-fun_prototype prototypes[MAXFUNC];
+extern fun_prototype prototypes[MAXFUNC];
+extern int prototypesSize;
 
 int addFuncPrototype(Node * node);
 

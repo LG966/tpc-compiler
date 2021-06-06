@@ -1,34 +1,28 @@
 %{
-/* parser.y */
-  #include <stdio.h>
-  #include "abstract-tree.h"
-  #include <string.h>
-  #include "symbolTable.h"
-  #include "operator.h"
-  #include "type.h"
-  #include "struct.h"
-  #include "gen_code_asm.h"
-  #include "func.h"
+    /* parser.y */
+    #include <stdio.h>
+    #include "abstract-tree.h"
+    #include <string.h>
+    #include "symbolTable.h"
+    #include "operator.h"
+    #include "type.h"
+    #include "struct.h"
+    #include "gen_code_asm.h"
+    #include "func.h"
+    #include "semantic.h" 
 
-  #define ERR_HEADER(NODE) (printf("%s:%d:%d:error: ", __BASE_FILE__, NODE->lineno, NODE->charno))
-
-  #define STRUCT_TYPE(NODE) ({int __val = getStructIndex(NODE->u.identifier); \
+    #define STRUCT_TYPE(NODE) ({int __val = getStructIndex(NODE->u.identifier); \
                             (__val == -1 ? ({ERR_HEADER(NODE); printf("unrecognized struct type '%s'\n", NODE->u.identifier); \
                             exit(EXIT_FAILURE); -1;}) : __val); })
 
+    extern int lineno;
+    extern int charno;
+    extern char text_line[100];
 
-  #define SEMANTIC_ERROR 2
-  #define DEFAULT_ERROR 3
-
-
-  extern int lineno;
-  extern int charno;
-  extern char text_line[100];
-
-  int yylex();
-  void yyerror(const char *);
-  Node * makeIdentifier(char * ident_name);
-  Node *racine;
+    int yylex();
+    void yyerror(const char *);
+    Node * makeIdentifier(char * ident_name);
+    Node *racine;
 %}
 
 
@@ -65,8 +59,8 @@ Prog:  TypesVars DeclFoncts     {
                                     /* printglobalST();
                                     printStructs();*/
                                     racine = $$;
-                                    printTree(racine);
-                                    printPrototypes();
+                                    /* printTree(racine);
+                                    printPrototypes(); */
                                 }
     ;
 TypesVars:
@@ -176,6 +170,8 @@ DeclFonct:
                                         case 3: ERR_HEADER(SIBLING(FIRSTCHILD($1))); printf("too many parameters in function '%s' (LIMIT : %d)\n", SIBLING(FIRSTCHILD($1))->u.identifier, MAXPARAMATERS); exit(DEFAULT_ERROR);
                                         default: break;
                                     }
+
+                                    check_SuiteInstr(SIBLING(FIRSTCHILD($2)));
                                 }
     ;
 EnTeteFonct:
@@ -444,7 +440,7 @@ LValue:
                                               Node *ident1 = makeIdentifier($1);
                                               Node *ident2 = makeIdentifier($3);
                                               addChild($$, ident1);
-                                              addSibling($$, ident2);
+                                              addSibling(ident1, ident2);
                                           }
     ;
 Arguments:

@@ -29,4 +29,6 @@ int getStructIndex(char * name);
 const char * getStructNameFromIndex(unsigned char i);
 void printStructs();
 
+native_t getMemberType(StructDecl * decl, char * member);
+
 #endif

@@ -1,6 +1,7 @@
 #include "func.h"
 
 int prototypesSize = 0;
+fun_prototype prototypes[MAXFUNC];
 
 static const char * getCharFromAnyType(type_kind kind, native_t n, unsigned char s){
     if (kind == native)

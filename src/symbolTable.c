@@ -126,13 +126,22 @@ void printfuncST(){
     printSTSymbols(funcST, funcSTsize);
 }
 
-int getSymbolIndexFromVarName(char *name){
+int getSymbolIndexFromVarNameLocal(char *name){
     int i = 0;
     for(i = 0; i < funcSTsize; i++){
         if(strcmp(name, funcST[i].name) == 0)
             return i;
     }
     return -1; /*variable not in funcST*/
+}
+
+int getSymbolIndexFromVarNameGlobal(char *name){
+    int i = 0;
+    for(i = 0; i < globalSTsize; i++){
+        if(strcmp(name, globalST[i].name) == 0)
+            return i;
+    }
+    return -1; /*variable not in globalST*/
 }
 
 void emptyfuncST(){

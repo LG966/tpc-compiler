@@ -19,7 +19,7 @@ vpath %.o $(BINPATH)
 
 all: addFolders $(EXECPATH)$(EXEC) #clean
 
-$(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o type.o struct.o func.o
+$(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o type.o struct.o func.o semantic.o
 	$(CC) -o $@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
 
 
@@ -45,6 +45,8 @@ type.o : type.c type.h
 struct.o : struct.c struct.h abstract-tree.o type.o
 
 func.o : func.c func.h type.o struct.o abstract-tree.o
+
+semantic.o : semantic.c semantic.h type.o struct.o operator.o func.o symbolTable.o
 
 %.o: %.c
 	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS)

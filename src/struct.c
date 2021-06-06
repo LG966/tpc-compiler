@@ -104,3 +104,14 @@ const char * getStructNameFromIndex(unsigned char i){
     assert(i < structsSize);
     return structs[i].name;
 }
+
+native_t getMemberType(StructDecl * decl, char * member){
+    for (size_t i = 0; i < decl->n_members; i++)
+    {
+        if (!strcmp(decl->members[i].name, member))
+        {
+            return decl->members[i].type;
+        }
+    }
+    return -1; // member not found
+}
