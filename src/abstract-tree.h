@@ -5,9 +5,15 @@
 #include "operator.h"
 #include "type.h"
 
+
 extern int lineno;
 extern int charno;
 
+#define ERR_HEADER(NODE) (printf("%s:%d:%d: error: ", "tpcc", NODE->lineno, NODE->charno))
+#define WAR_HEADER(NODE) (printf("%s:%d:%d: warning: ", "tpcc", NODE->lineno, NODE->charno))
+
+#define SEMANTIC_ERROR 2
+#define DEFAULT_ERROR 3 
 
 typedef enum {
   Program,

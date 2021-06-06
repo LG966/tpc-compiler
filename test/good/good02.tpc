@@ -1,7 +1,7 @@
 /* test-table-symboles.tpc */
 
 /* Test file for simplified translator of a declaration of variables in C */
-    int r1,b,s,c,r2 ;
+    int r1,b,s,c,r2;
 	char letter, digit, punct;
 
 struct elephant{
@@ -12,19 +12,18 @@ struct elephant{
 struct elephant a1;
 
 int test (int param1, char param2, char param3){
-    int a, b, c, d;
-    char m;
+    int r1,b,s,c,r2 ;
+    char letter, digit, punct;
 }
 
 int main(void)  {
-   main_a=12;
-   main_a=24;
-   b=r1+r2;
-   punct='.';
-   notreco = 3 % 2;
-   return b;
-
-   if(true && false){
-       6 + 4;
+    r1=12;
+    b=test(1, 'a', 'b');
+    b=r1+r2;
+    letter='.';
+    s = 3 % 2;
+    return b;   
+    if(0 && 1){
+        6 + 4;
    }
 }

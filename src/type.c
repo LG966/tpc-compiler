@@ -20,9 +20,9 @@ char * getCharFromNativeType(native_t t){
     switch (t)
     {
     case tpc_int:
-        return "int"; //4bytes
+        return "int";
     case tpc_char:
-        return "char"; //1byte
+        return "char";
     case tpc_void:
         return "void";
     default:

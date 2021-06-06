@@ -1,0 +1,16 @@
+struct s{
+    char a, b;
+};
+
+
+int foo(char a, int b){
+    return 2 + 9;
+}
+
+int main(void){
+    struct s a;
+    
+    a.a = foo(5, 'b');
+
+    return 0;
+}

@@ -15,8 +15,6 @@ static int addMember(const char name[], native_t type, StructDecl * struc){
     {
         if (!strcmp(struc->members[count].name, name))
         {
-            /* printf("semantic error, redefinition of variable %s near line %d\n",
-            name, lineno); */
             return 1;
         }
     }
@@ -73,17 +71,17 @@ int addStructDecl(Node * node){
 
 void printStructs(){
     int i, j;
-    printf("\n******* STRUCTS ********\n");
-    printf("--- Number of structs : %d ---\n", structsSize);
+    printf("\nDefininitions of struct types (%d definition(s)) ->\n", structsSize);
 
     for (i = 0; i < structsSize; i++)
     {
-        printf("\tStruct %s :\n", structs[i].name);
+        printf("\n\tStruct %s :\n", structs[i].name);
         for (j = 0; j < structs[i].n_members; j++)
         {
             printf("\t\t%s %s;\n", getCharFromNativeType(structs[i].members[j].type), structs[i].members[j].name);
         }
     }
+    putchar('\n');
 }
 
 int getStructIndex(char * name){

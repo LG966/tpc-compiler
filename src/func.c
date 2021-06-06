@@ -22,7 +22,7 @@ int addFuncPrototype(Node * node){
 
     Node * name = SIBLING(FIRSTCHILD(FIRSTCHILD(node)));
     Node * parameter = FIRSTCHILD(SIBLING(SIBLING(FIRSTCHILD(FIRSTCHILD(node)))));
-    int params = 0;
+    int params = 0, r;
 
     assert(node->kind == DeclFonct);
 
@@ -44,7 +44,15 @@ int addFuncPrototype(Node * node){
     if (FIRSTCHILD(FIRSTCHILD(node))->kind == StructType)
     {
         prototypes[prototypesSize].return_type_kind = struc;
-        prototypes[prototypesSize].return_type.struc = getStructIndex(FIRSTCHILD(FIRSTCHILD(node))->u.identifier);
+        r = getStructIndex(FIRSTCHILD(FIRSTCHILD(node))->u.identifier);
+        prototypes[prototypesSize].return_type.struc = r;
+        if (r == -1)
+        {
+            ERR_HEADER(FIRSTCHILD(FIRSTCHILD(node)));
+            printf("function has unrecognized return type 'struct %s' \n", FIRSTCHILD(FIRSTCHILD(node))->u.identifier);
+            exit(2);
+        }
+        
     }else{
         prototypes[prototypesSize].return_type_kind = native;
         if (FIRSTCHILD(FIRSTCHILD(node))->kind == Void)
@@ -95,9 +103,10 @@ int getIndexFromFunName(char *name){
 }
 
 void printPrototypes(){
-
+    printf("Function prototypes (%d prototype(s)) ->\n", prototypesSize);
     for (size_t i = 0; i < prototypesSize; i++)
     {
+        putchar('\t');
         if (prototypes[i].return_type_kind == native)
         {
             printf("%s ", getCharFromNativeType(prototypes[i].return_type.native));

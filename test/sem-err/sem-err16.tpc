@@ -1,0 +1,29 @@
+struct s{
+    int a, b;
+};
+
+struct m{
+    int a, b;
+};
+
+struct m glo;
+
+int foo(char a, int b){
+    print(a);
+    print(b);
+    return a + b;
+}
+
+void bar(void){
+    return;
+}
+
+int main(void){
+    struct m a;
+    if(a.a + 'a' / bar()){
+        a.a = 2;
+        a.b = 3;
+    }
+    
+    return 0;
+}

@@ -1,0 +1,22 @@
+struct s{
+    int a, b;
+};
+
+struct m{
+    int a, b;
+};
+
+int foo(int a, int b){
+    while(a){
+        print(a);
+        a = a - 1;
+    }
+    return a.a + b;
+}
+
+int main(void){
+    int a;
+    a = foo('a', a);
+
+    return 0;
+}

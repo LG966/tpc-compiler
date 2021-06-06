@@ -6,17 +6,17 @@ struct Point{
 
 struct Point newPoint(int x, int y){
         struct Point p;
-        pX = x;
-        pY = y;
+        p.x = x;
+        p.y = y;
         return p;
 }
 
 int main(void){
         struct Point p;
 
-        p = newPoint(5, 6); //Nouvea Point
-        print(p.pX);
-        print(p.pY);
+        p = newPoint(5, 6); //Nouveau Point
+        print(p.x);
+        print(p.y);
 
       return 0;
 }

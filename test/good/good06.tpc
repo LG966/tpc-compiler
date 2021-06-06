@@ -9,7 +9,7 @@ int main(void)  {
    quotient=24/12;
    letter='c';
    digit='0';
-   letter=letter+('A'-'a');
+   indice=letter+('A'-'a');
    print(quotient);
    print(letter);
    print('\n');

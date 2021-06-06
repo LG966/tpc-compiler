@@ -12,7 +12,7 @@ static const char *StringFromOperator[] = {
   "<=",
   ">",
   ">=",
-  "=",
+  "==",
   "!=",
   "!",
   "&"
@@ -33,6 +33,5 @@ Operator getOperatorFromString(char * s){
             return i;
         }
     }
-    fprintf(stderr, "SEGFAULT INCOMING HIHI \n");
     return -1;
 }

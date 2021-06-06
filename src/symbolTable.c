@@ -41,7 +41,6 @@ int findGlobalSymbol(const char name[MAXNAME]){
 
 void printSTSymbols(STentry * table, int size){
     int i;
-    /* printf("%%--- Symbol table ---%%\n"); */
     for(i=0; i!=size; i++){
         if (table[i].kind == native)
         {
@@ -56,14 +55,11 @@ int addVarToST_native(const char name[], native_t type, STentry * table, int * s
     int count;
     for (count=0;count<*size;count++) {
         if (!strcmp(table[count].name,name)) {
-            /* printf("semantic error, redefinition of variable %s near line %d\n",
-            name, lineno); */
             return 1;
         }
     }
     if (*size+1 > MAXSYMBOLS) {
-        /* printf("too many variables near line %d\n", lineno);
-        exit(1); */ return 2;
+        return 2;
     }
     table[*size].kind = native;
     strncpy(table[*size].name, name, MAXNAME - 1);
@@ -78,14 +74,11 @@ int addVarToST_struct(const char name[], unsigned char struct_type, STentry * ta
     int count;
     for (count=0;count<*size;count++) {
         if (!strcmp(table[count].name,name)) {
-            /* printf("semantic error, redefinition of variable %s near line %d\n",
-            name, lineno); */
             return 1;
         }
     }
     if (*size+1 > MAXSYMBOLS) {
-        /* printf("too many variables near line %d\n", lineno);
-        exit(1); */ return 2;
+        return 2;
     }
     table[*size].kind = struc;
     strncpy(table[*size].name, name, MAXNAME - 1);
@@ -98,8 +91,6 @@ int addVarToST_struct(const char name[], unsigned char struct_type, STentry * ta
 
 
 int addfuncVar_native(const char name[], native_t type){
-    if(findGlobalSymbol(name) == 1)
-        return 3; /*Variable déjà définie en global*/
     return addVarToST_native(name, type, funcST, &funcSTsize);
 }
 
@@ -117,12 +108,12 @@ int addglobalVar_struct(const char name[], unsigned char struct_type){
 }
 
 void printglobalST(){
-    printf("\n******* GLOBALS ********\n");
+    printf("\nGlobal variables -> \n");
     printSTSymbols(globalST, globalSTsize);
 }
 
 void printfuncST(){
-    printf("******* LOCALS ********\n");
+    printf("\n");
     printSTSymbols(funcST, funcSTsize);
 }
 

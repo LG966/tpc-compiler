@@ -1,0 +1,20 @@
+struct s{
+    int a, b;
+};
+
+struct m{
+    int a, b;
+};
+
+int foo(int b, int b){
+    return b.a + b;
+}
+
+int main(void){
+    int a;
+    struct s b;
+    struct m c;
+    a = foo(a, b.a);
+
+    return 0;
+}

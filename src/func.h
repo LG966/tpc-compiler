@@ -1,12 +1,12 @@
 #ifndef __FUNC__
 #define __FUNC__
 
+#include "abstract-tree.h"
 #include "type.h"
 #include "struct.h"
-#include "abstract-tree.h"
 
 #define MAXPARAMATERS 16
-#define MAXFUNC 128
+#define MAXFUNC 128 
 
 typedef struct func{
     //function name

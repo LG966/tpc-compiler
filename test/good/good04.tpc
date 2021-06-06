@@ -7,6 +7,24 @@ int r1, r2;
 int max;
 char test;
 
+int trinome(int a,int b, int c) {
+    int d;
+    int s;
+    d=b*b-4*a*c;
+    if (d>=0) {
+        s=/*sqrt*/(d);
+        r1=(-b+s)/(2*a);
+        r2=(-b-s)/(2*a);
+        return 1;
+    }
+    return 0;
+}
+
+int valeur(int a, int b, int c, int x) {
+    return a*x*x+b*x+c;
+}
+
+
 int main(void) {
    int b, c;
    b=-1;
@@ -28,19 +46,3 @@ int main(void) {
    return 0;
 }
 
-int trinome(int a,int b, int c) {
-    int d;
-    int s;
-    d=b*b-4*a*c;
-    if (d>=0) {
-        s=sqrt(d);
-        r1=(-b+s)/(2*a);
-        r2=(-b-s)/(2*a);
-        return 1;
-    }
-    return 0;
-}
-
-int valeur(int a, int b, int c, int x) {
-    return a*x*x+b*x+c;
-}

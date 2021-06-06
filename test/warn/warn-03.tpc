@@ -1,0 +1,16 @@
+struct s{
+    int a, b;
+};
+
+
+char foo(char a, int b){
+    return 2 + 9;
+}
+
+int main(void){
+    char a;
+    
+    reade(a);
+
+    return 0;
+}

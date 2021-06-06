@@ -19,7 +19,7 @@ vpath %.o $(BINPATH)
 
 all: addFolders $(EXECPATH)$(EXEC) #clean
 
-$(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o type.o struct.o func.o semantic.o
+$(EXECPATH)$(EXEC): parser.tab.o lex.yy.o abstract-tree.o symbolTable.o gen_code_asm.o operator.o type.o struct.o func.o semantic.o option.o
 	$(CC) -o $@ $(addprefix $(BINPATH), $(notdir $^)) $(LDFLAGS)
 
 
@@ -48,13 +48,15 @@ func.o : func.c func.h type.o struct.o abstract-tree.o
 
 semantic.o : semantic.c semantic.h type.o struct.o operator.o func.o symbolTable.o
 
+option.o : option.c option.h
+
 %.o: %.c
 	$(CC) -o $(BINPATH)$@ -c $(SRCPATH)$(notdir $<) $(CFLAGS)
 
 addFolders: | $(EXECPATH) $(BINPATH)
 
 trad:
-	nasm -f elf64 -o $(BINPATH)comp.o $(SRCPATH)comp.asm
+	nasm -f elf64 -o $(BINPATH)comp.o _anonymous.asm
 	$(CC) $(BINPATH)comp.o -nostartfiles -no-pie
 
 $(EXECPATH):
@@ -70,7 +72,7 @@ clean:
 
 mrproper: clean
 	rm -f $(EXECPATH)$(EXEC)
-	rm -f $(SRCPATH)comp.asm
+	rm -f _anonymous.asm
 	rm -f ./test/resultat.log
 	rm -f a.out
 

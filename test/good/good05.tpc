@@ -1,14 +1,4 @@
-/*
-Fichier qui va tester les tokens suivant:
-	- STRUCT
-	- IDENT
-	- TYPE
-	- READE
-	- RETURN
-*/
-// #include <stdio.h>
-
-struct type1{
+struct type1 {
 		int c;
 };
 
@@ -16,13 +6,12 @@ struct type2 {
 		char d;
 };
 
-struct type3{
+struct type3 {
 		int d;
 		char t;
 };
 
-struct
-global {
+struct global {
 	int size;
 	char rep;
 };
@@ -42,8 +31,8 @@ int main(void){
 	reade(value1);
 	reade(value2);
 
-	printf(value1);
-	printf(value2);
+	print(value1);
+	print(value2);
 
 	return 0;
 }

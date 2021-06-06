@@ -10,6 +10,7 @@ static native_t nat;            //native type to check after check_exp returns n
 static unsigned char str;       //struct type to check after check_exp returns struc
 
 
+static void check_Instr(Node * i);
 
 static type_kind check_Exp(Node * exp){
     int tmp, i;
@@ -154,7 +155,7 @@ static type_kind check_Exp(Node * exp){
                     return native;
                 }
             }
-        default: assert(!"WTF."); return native;
+        default: assert(!"."); return native;
     }
 }
 
@@ -245,6 +246,10 @@ static void check_IfWhile(Node * iw){
         exit(SEMANTIC_ERROR);
     }
     MUST_NOT_VOID(FIRSTCHILD(iw));
+    check_Instr(SIBLING(FIRSTCHILD(iw)));
+
+    if (iw->kind == IfElse){ check_Instr(SIBLING(SIBLING(FIRSTCHILD(iw)))); }
+    
 }
 
 static void check_Return(Node * r){
@@ -281,7 +286,6 @@ static void check_Return(Node * r){
                 exit(SEMANTIC_ERROR);
             }
         }else{ // return has struct type
-        printf("ok98749687498674986748\n");
             if (pro->return_type_kind != struc)
             {
                 ERR_HEADER(r);
@@ -298,24 +302,29 @@ static void check_Return(Node * r){
     }
 }
 
+static void check_Instr(Node * i){
+    switch (i->kind)
+    {
+    case Assignement: check_assignement(i); return;
+    case Reade: check_Reade(i); return;
+    case Readc: check_Readc(i); return;
+    case Print: check_Print(i); return;
+    case While:
+    case LoneIf:
+    case IfElse: check_IfWhile(i); return;
+    case Return: check_Return(i); return;
+    case SuiteInstr: check_SuiteInstr(i); return;
+    case Void: return; //do nothing
+    default: check_Exp(i); return;
+    }
+}
+
 void check_SuiteInstr(Node * si){
     assert(si->kind == SuiteInstr);
 
-
-    for (Node * i = FIRSTCHILD(si); si != NULL; si = SIBLING(si))
+    for (Node * i = FIRSTCHILD(si); i != NULL; i = SIBLING(i))
     {
-        switch (i->kind)
-        {
-        case Assignement: check_assignement(i); return;
-        case Reade: check_Reade(i); return;
-        case Readc: check_Readc(i); return;
-        case Print: check_Print(i); return;
-        case While:
-        case LoneIf:
-        case IfElse: check_IfWhile(i); return;
-        case Return: check_Return(i); return;
-        default: break;
-        }
+        check_Instr(i);
     }
     
 }

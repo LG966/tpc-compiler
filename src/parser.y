@@ -9,7 +9,8 @@
     #include "struct.h"
     #include "gen_code_asm.h"
     #include "func.h"
-    #include "semantic.h" 
+    #include "option.h"
+    #include "semantic.h"
 
     #define STRUCT_TYPE(NODE) ({int __val = getStructIndex(NODE->u.identifier); \
                             (__val == -1 ? ({ERR_HEADER(NODE); printf("unrecognized struct type '%s'\n", NODE->u.identifier); \
@@ -56,11 +57,14 @@ Prog:  TypesVars DeclFoncts     {
                                     $$ = makeNode(Program);
                                     addChild($$, $1);
                                     addChild($$, $2);
-                                    /* printglobalST();
-                                    printStructs();*/
+                                    
                                     racine = $$;
-                                    /* printTree(racine);
-                                    printPrototypes(); */
+                                    if(OPTION_TREE()){ printTree(racine); }
+                                    if(OPTION_SYMTABS()){
+                                        printglobalST();
+                                        printStructs();
+                                        printPrototypes();
+                                    }
                                 }
     ;
 TypesVars:
@@ -158,9 +162,10 @@ DeclFonct:
                                     addChild($$, $2);
 
                                     // Table des symboles locales
-                                    printf("\nfun %s -> ", SECONDCHILD($1)->u.identifier);
-                                    printfuncST();
-                                    emptyfuncST();
+                                    if(OPTION_SYMTABS()){
+                                        printf("\nLocal variables of function '%s' -> ", SECONDCHILD($1)->u.identifier);
+                                        printfuncST();
+                                    }
 
                                     //Ajout dans la table des prototypes
                                     switch(addFuncPrototype($$))
@@ -172,6 +177,7 @@ DeclFonct:
                                     }
 
                                     check_SuiteInstr(SIBLING(FIRSTCHILD($2)));
+                                    emptyfuncST();
                                 }
     ;
 EnTeteFonct:
@@ -201,17 +207,17 @@ Parametres:
                             if(ident->kind == Type)
                             {
                                 switch(addfuncVar_native(FIRSTCHILD(ident)->u.identifier, ident->u.type)){
-                                    case 1: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("redifinition of variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
-                                    case 2: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
-                                    case 3: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("redifinition of global variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
+                                    case 1: ERR_HEADER(FIRSTCHILD(ident)); printf("redifinition of variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
+                                    case 2: ERR_HEADER(FIRSTCHILD(ident)); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                    /* case 3: ERR_HEADER(FIRSTCHILD(ident)); printf("redifinition of global variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR); */
                                     default: break;
                                 }
                             }
                             else
                             {
                                 switch(addfuncVar_struct(FIRSTCHILD(ident)->u.identifier, STRUCT_TYPE(ident))){
-                                    case 1: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("redifinition of variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
-                                    case 2: ERR_HEADER(SIBLING(FIRSTCHILD(ident))); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
+                                    case 1: ERR_HEADER(FIRSTCHILD(ident)); printf("redifinition of variable '%s'\n", FIRSTCHILD(ident)->u.identifier); exit(SEMANTIC_ERROR);
+                                    case 2: ERR_HEADER(FIRSTCHILD(ident)); printf("too many local variables defined (LIMIT : %d)\n", MAXSYMBOLS); exit(DEFAULT_ERROR);
                                     default: break;
                                 }
                             }
@@ -465,23 +471,26 @@ ListExp:
 %%
 
 int main(int argc, char** argv) {
-    /* #ifdef YYDEBUG
-    yydebug = 1;
-    #endif */
     int rtr;
     FILE *file;
-    rtr = yyparse();
-    if(NULL == (file = fopen("./src/comp.asm", "w")))
-        return -1;
 
-    /*Regrouper dans une fonction qui lance tout ?*/
-    begin_data_asm(file, globalST);
-    begin_texte_asm(file);
-    emptyfuncST();
-    gen_code_by_tree(file, globalST, racine);
-    /**/
+    if(!parse_options(argc, argv))
+    {
+        return 0;
+    }
+
+    rtr = yyparse();
+
+    if(NULL == (file = fopen("./_anonymous.asm", "w")))
+    {
+        printf("%s: error: unable to create .asm file\n", __FILE__);
+        return DEFAULT_ERROR;        
+    }
+
+    generate(file, racine);
+
     fclose(file);
-	  return rtr;
+	return rtr;
 }
 
 void display_error(){

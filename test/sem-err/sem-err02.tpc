@@ -1,0 +1,8 @@
+
+
+int main(void){
+    int a;
+    a = foo(15);
+
+    return 0;
+}

@@ -20,12 +20,14 @@ int index_func;
 void begin_data_asm(FILE *file, STentry *symbolTable);
 void begin_texte_asm(FILE *file);
 void write_expresion(FILE *file, Node *node);
-void gen_code_by_tree(FILE *file, STentry *symbolTable, Node *node);
+void gen_code_by_tree(FILE *file, Node *node);
 
 void create_FuncPlace_with_FuncST();
 int getPlaceFromName(char *name);
 void addFuncPlace(char *name);
 void printFuncPlace();
 void empty_FunPlace();
+
+void generate(FILE *file, Node *racine);
 
 #endif

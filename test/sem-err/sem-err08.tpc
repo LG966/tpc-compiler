@@ -1,0 +1,19 @@
+struct s{
+    int a, b;
+};
+
+struct m{
+    int a, b;
+};
+
+int foo(char a, int b){
+    print(a);
+    return a + b;
+}
+
+int main(void){
+    
+    foo('a');
+
+    return 0;
+}

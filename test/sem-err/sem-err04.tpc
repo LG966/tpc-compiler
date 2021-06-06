@@ -1,0 +1,16 @@
+struct s{
+    int a, b;
+};
+
+
+int foo(int a, int b){
+    return a + b;
+}
+
+int main(void){
+    int a;
+    struct s b;
+    a = foo(15, b);
+
+    return 0;
+}
